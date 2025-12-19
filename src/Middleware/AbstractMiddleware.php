@@ -181,12 +181,12 @@ abstract class AbstractMiddleware implements WpHooksInterface
         $error = $response instanceof WP_Error ? $response : new WP_Error();
         if (is_array($rejection)) {
             foreach ($rejection as $reject) {
-                $error->add($reject->getStatus(), $reject->getMessage());
+                $error->add($reject->getCode(), $reject->getMessage(), ['status' => $reject->getStatus()]);
             }
             return rest_convert_error_to_response($error);
         }
 
-        $error->add($rejection->getStatus(), $rejection->getMessage());
+        $error->add($rejection->getCode(), $rejection->getMessage(), ['status' => $rejection->getStatus()]);
 
         return rest_convert_error_to_response($error);
     }
