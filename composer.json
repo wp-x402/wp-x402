@@ -44,6 +44,9 @@
     "yoast/phpunit-polyfills": "^4.0"
   },
   "autoload": {
+    "files": [
+      "src/functions.php"
+    ],
     "psr-4": {
       "TheFrosty\\WpX402\\": "src"
     }
