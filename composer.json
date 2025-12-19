@@ -1,0 +1,56 @@
+{
+  "name": "thefrosty/wp-x402",
+  "type": "wordpress-plugin",
+  "description": "A payments middleware for WordPress.",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Austin Passy",
+      "email": "thefrosty@users.noreply.github.com",
+      "homepage": "https://austin.passy.co/"
+    }
+  ],
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true,
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "roots/wordpress-core-installer": true
+    },
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "8.3"
+    },
+    "preferred-install": "dist",
+    "sort-packages": true
+  },
+  "require": {
+    "php": "^8.3",
+    "dwnload/wp-settings-api": "^3.10",
+    "pimple/pimple": "~3.0",
+    "symfony/http-foundation": "^7.3.7",
+    "thefrosty/wp-utilities": "^3.8.8"
+  },
+  "require-dev": {
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",
+    "phpcompatibility/php-compatibility": "*",
+    "phpunit/php-code-coverage": "^11",
+    "phpunit/phpunit": "^11",
+    "rector/rector": "^2.0",
+    "roots/wordpress": "^6.8",
+    "slevomat/coding-standard": "~8.18",
+    "squizlabs/php_codesniffer": "^3.2",
+    "wp-coding-standards/wpcs": "^3.1",
+    "wp-phpunit/wp-phpunit": "^6.8",
+    "yoast/phpunit-polyfills": "^4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "TheFrosty\\WpX402\\": "src"
+    }
+  },
+  "scripts": {
+    "phpcs": "bash ./vendor/thefrosty/wp-utilities/bin/phpcs.sh --standard=phpcs-ruleset.xml",
+    "phpunit": "./vendor/bin/phpunit --colors",
+    "phpunit:coverage": "./vendor/bin/phpunit --colors --coverage-html ./tests/results && php ./tests/clover-results.php ./tests/clover.xml 10"
+  }
+}
