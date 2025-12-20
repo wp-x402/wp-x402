@@ -4,11 +4,45 @@ declare(strict_types=1);
 
 namespace TheFrosty\WpX402;
 
+use Dwnload\WpSettingsApi\Api\Options;
 use TheFrosty\WpX402\Api\Api;
 use TheFrosty\WpX402\Content\Payment;
 use TheFrosty\WpX402\Middleware\Middleware;
 use TheFrosty\WpX402\Middleware\Rejection;
+use TheFrosty\WpX402\Settings\Settings;
 use TheFrosty\WpX402\Telemetry\EventType;
+
+/**
+ * Return the price setting.
+ * @return float|string
+ */
+function getPrice(): float|string
+{
+    return getSetting(
+        Settings::PRICE,
+        Payment::DEFAULT_PRICE
+    );
+}
+
+/**
+ * Return the wallet setting.
+ * @return string
+ */
+function getWallet(): string
+{
+    return getSetting(Settings::WALLET, Payment::TESTNET_WALLET);
+}
+
+/**
+ * Get our general setting by key.
+ * @param string $key
+ * @param mixed|null $default
+ * @return mixed
+ */
+function getSetting(string $key, mixed $default = null): mixed
+{
+    return Options::getOption($key, Settings::GENERAL_SETTINGS, $default);
+}
 
 /**
  * Returns the Middleware.
@@ -42,15 +76,12 @@ function reject(string $code, string $message, int|null $status): Rejection
  */
 function telemetry(EventType $event_type, array $meta = []): void
 {
-    $wallet = get_option('x402_wallet', Payment::TESTNET_WALLET);
-    $price = get_option('x402_price', Payment::DEFAULT_PRICE);
-
     $data = [
         Api::ACTION => Api::ACTION_COLLECT,
         'event_type' => $event_type->value,
         'project_type' => 'wordpress-plugin',
-        'wallet' => $wallet,
-        'amount' => $price,
+        'wallet' => getWallet(),
+        'amount' => getPrice(),
         'meta' => $meta,
     ];
 

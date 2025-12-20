@@ -26,6 +26,8 @@ use function sprintf;
 use function status_header;
 use function strip_tags;
 use function TheFrosty\WpUtilities\exitOrThrow;
+use function TheFrosty\WpX402\getPrice;
+use function TheFrosty\WpX402\getWallet;
 use function TheFrosty\WpX402\telemetry;
 use function wp_remote_retrieve_response_code;
 use const FILTER_VALIDATE_BOOL;
@@ -51,7 +53,7 @@ class Payment extends AbstractContainerProvider implements HttpFoundationRequest
     /**
      * Redirect based on current template conditions.
      * @throws \JsonException
-     * @throws TheFrosty\WpUtilities\Exceptions\TerminationException
+     * @throws \TheFrosty\WpUtilities\Exceptions\TerminationException
      */
     protected function templateRedirect(): void
     {
@@ -88,8 +90,6 @@ class Payment extends AbstractContainerProvider implements HttpFoundationRequest
         }
 
         // 2. Retrieve Settings.
-        $wallet = get_option('x402_wallet', self::TESTNET_WALLET);
-        $price = get_option('x402_price', self::DEFAULT_PRICE);
         $url = Api::getApiUrl();
 
         // 3. Check for Payment Header.
@@ -100,8 +100,8 @@ class Payment extends AbstractContainerProvider implements HttpFoundationRequest
             status_header(WP_Http::PAYMENT_REQUIRED);
 
             $data = [
-                'maxAmountRequired' => $price,
-                'payTo' => $wallet,
+                'maxAmountRequired' => getPrice(),
+                'payTo' => getWallet(),
                 'resource' => get_permalink(),
                 'asset' => self::TESTNET_ASSET, // USDC on Base.
                 'network' => 'base-mainnet',

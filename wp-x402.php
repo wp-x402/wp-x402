@@ -18,9 +18,11 @@ namespace TheFrosty\WpX402;
 
 defined('ABSPATH') || exit;
 
+use Dwnload\WpSettingsApi\WpSettingsApi;
 use Symfony\Component\HttpFoundation\Request;
 use TheFrosty\WpUtilities\Plugin\PluginFactory;
 use TheFrosty\WpUtilities\WpAdmin\DisablePluginUpdateCheck;
+use TheFrosty\WpX402\Settings\Settings;
 use function defined;
 use function is_readable;
 
@@ -37,4 +39,6 @@ $plugin
     ->add(new DisablePluginUpdateCheck())
     ->add(new Content\Payment($plugin->getContainer()))
     ->add(new Middleware\Middleware())
+    ->add(new Settings())
+    ->add(new WpSettingsApi(Settings::factory(VERSION)))
     ->initialize();
