@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TheFrosty\WpX402\Api;
 
+use Multicoin\AddressValidator\WalletAddressValidator;
 use TheFrosty\WpUtilities\Api\WpRemote;
 use WP_Error;
 use function array_merge;
@@ -27,6 +28,17 @@ class Api
     public const string ACTION_VERIFY = 'verify';
 
     final public const string USER_AGENT = 'WpX402';
+
+    /**
+     * Validate the wallet address based on supported networks.
+     * @param WalletAddressValidator $validator
+     * @param string $value The wallet address to validate
+     * @return bool
+     */
+    public static function isValidWallet(WalletAddressValidator $validator, string $value): bool
+    {
+        return $validator->validate($value, 'eth') || $validator->validate($value, 'sol');
+    }
 
     /**
      * Get the API URL.

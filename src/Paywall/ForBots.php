@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TheFrosty\WpX402\Paywall;
 
-use Multicoin\AddressValidator\WalletAddressValidator;
 use TheFrosty\WpX402\Api\Api;
 use TheFrosty\WpX402\Api\Bots;
 use TheFrosty\WpX402\ServiceProvider;
@@ -72,10 +71,10 @@ class ForBots extends AbstractPaywall
             return;
         }
 
-        // 2. Validate Wallet.
+        // 2. Validate the wallet once more.
         $wallet = getWallet();
         $validator = $this->getContainer()?->get(ServiceProvider::WALLET_ADDRESS_VALIDATOR);
-        if ($validator instanceof WalletAddressValidator && !$validator->validate($wallet)) {
+        if (!Api::isValidWallet($validator, $wallet)) {
             return; // @TODO we should look into doing something if a wallet is invalid
         }
 
