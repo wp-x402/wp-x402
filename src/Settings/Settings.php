@@ -11,7 +11,7 @@ use Dwnload\WpSettingsApi\Settings\SectionManager;
 use Dwnload\WpSettingsApi\SettingsApiFactory;
 use Dwnload\WpSettingsApi\WpSettingsApi;
 use TheFrosty\WpUtilities\Plugin\AbstractHookProvider;
-use TheFrosty\WpX402\Content\Payment;
+use TheFrosty\WpX402\Paywall\PaywallInterface;
 use function __;
 use function array_unshift;
 use function esc_attr__;
@@ -117,7 +117,7 @@ class Settings extends AbstractHookProvider
                     // phpcs:ignore Generic.Files.LineLength.TooLong
                     __('USDC is a cryptocurrency stablecoin which is issued by Circle. It is pegged to the United States dollar, and is distinct from a central bank digital currency.', 'wp-x402')
                 ),
-                SettingField::DEFAULT => Payment::DEFAULT_PRICE,
+                SettingField::DEFAULT => PaywallInterface::DEFAULT_PRICE,
                 SettingField::TYPE => FieldTypes::FIELD_TYPE_NUMBER,
                 SettingField::ATTRIBUTES => [
                     'min' => '0.01',
