@@ -116,6 +116,7 @@ class Settings extends AbstractHookProvider
                         return sanitize_text_field($value);
                     }
 
+                    // @TODO Add settings error notice on invalid wallet address...
                     return '';
                 },
                 SettingField::SECTION_ID => $settings_section_id,
