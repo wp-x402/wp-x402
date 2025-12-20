@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace TheFrosty\WpX402\Paywall;
 
+use Multicoin\AddressValidator\WalletAddressValidator;
 use TheFrosty\WpX402\Api\Api;
 use TheFrosty\WpX402\Api\Bots;
+use TheFrosty\WpX402\ServiceProvider;
 use TheFrosty\WpX402\Telemetry\EventType;
 use WP_Http;
 use function array_keys;
@@ -70,8 +72,12 @@ class ForBots extends AbstractPaywall
             return;
         }
 
-        // 2. Retrieve Settings.
-        $url = Api::getApiUrl();
+        // 2. Validate Wallet.
+        $wallet = getWallet();
+        $validator = $this->getContainer()?->get(ServiceProvider::WALLET_ADDRESS_VALIDATOR);
+        if ($validator instanceof WalletAddressValidator && !$validator->validate($wallet)) {
+            return; // @TODO we should look into doing something if a wallet is invalid
+        }
 
         // 3. Check for Payment Header.
         $payment_hash = $this->getPaymentHash();
@@ -82,7 +88,7 @@ class ForBots extends AbstractPaywall
 
             $data = [
                 'maxAmountRequired' => getPrice(),
-                'payTo' => getWallet(),
+                'payTo' => $wallet,
                 'resource' => get_permalink(),
                 'asset' => self::TESTNET_ASSET, // USDC on Base.
                 'network' => 'base-mainnet',
@@ -96,7 +102,10 @@ class ForBots extends AbstractPaywall
         }
 
         // Scenario B: Verify Payment Hash.
-        $response = Api::wpRemote($url, [Api::ACTION => Api::ACTION_VERIFY, 'paymentHash' => $payment_hash]);
+        $response = Api::wpRemote(
+            Api::getApiUrl(),
+            [Api::ACTION => Api::ACTION_VERIFY, 'paymentHash' => $payment_hash]
+        );
 
         if (is_wp_error($response)) {
             status_header(WP_Http::BAD_REQUEST);

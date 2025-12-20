@@ -19,7 +19,6 @@ namespace TheFrosty\WpX402;
 defined('ABSPATH') || exit;
 
 use Dwnload\WpSettingsApi\WpSettingsApi;
-use Symfony\Component\HttpFoundation\Request;
 use TheFrosty\WpUtilities\Plugin\PluginFactory;
 use TheFrosty\WpUtilities\WpAdmin\DisablePluginUpdateCheck;
 use TheFrosty\WpX402\Settings\Settings;
@@ -34,12 +33,12 @@ const VERSION = '0.1.0';
 
 $plugin = PluginFactory::create('wp-x402');
 $container = $plugin->getContainer();
-$container['request'] = static fn(): Request => Request::createFromGlobals();
+$container->register(new ServiceProvider());
 
 $plugin
     ->add(new DisablePluginUpdateCheck())
     ->add(new Middleware\Middleware())
     ->add(new Paywall\ForBots($container))
-    ->add(new Settings())
+    ->add(new Settings($container))
     ->add(new WpSettingsApi(Settings::factory(VERSION)))
     ->initialize();
