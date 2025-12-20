@@ -22,7 +22,7 @@ class Api
 
     use WpRemote;
 
-    public const string ACTION = 'x402-action';
+    public const string ACTION = 'wp_x402';
     public const string ACTION_COLLECT = 'collect';
     public const string ACTION_VERIFY = 'verify';
 
@@ -48,11 +48,9 @@ class Api
     public static function wpRemote(string $url, array $data, array $args = []): array|WP_Error
     {
         $defaults = [
-            'headers' => [
-                'user-agent' => sprintf('%s/%s; %s', self::USER_AGENT, VERSION, esc_url(get_bloginfo('url'))),
-            ],
             'body' => json_encode($data, JSON_THROW_ON_ERROR),
             'timeout' => 7,
+            'user-agent' => sprintf('%s/%s; %s', self::USER_AGENT, VERSION, esc_url(get_bloginfo('url'))),
         ];
 
         return (new self())->wpRemotePost($url, array_merge($defaults, $args));
