@@ -116,7 +116,12 @@ class Settings extends AbstractHookProvider
                         return sanitize_text_field($value);
                     }
 
-                    // @TODO Add settings error notice on invalid wallet address...
+                    add_settings_error(
+                        self::WALLET,
+                        'invalid_wallet_address',
+                        esc_html__('Invalid or unsupported wallet address.', 'wp-x402')
+                    );
+
                     return '';
                 },
                 SettingField::SECTION_ID => $settings_section_id,
@@ -137,6 +142,7 @@ class Settings extends AbstractHookProvider
                 ),
                 SettingField::DEFAULT => PaywallInterface::DEFAULT_PRICE,
                 SettingField::TYPE => FieldTypes::FIELD_TYPE_NUMBER,
+                SettingField::SIZE => 'small',
                 SettingField::ATTRIBUTES => [
                     'min' => '0.01',
                     'step' => '0.01',

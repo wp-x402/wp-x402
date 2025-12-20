@@ -12,7 +12,6 @@ use function array_keys;
 use function get_permalink;
 use function get_post;
 use function get_the_date;
-use function get_the_ID;
 use function get_the_title;
 use function is_attachment;
 use function is_singular;
@@ -117,7 +116,7 @@ class ForBots extends AbstractPaywall
                 'access' => 'granted',
                 'title' => get_the_title($post),
                 'content' => strip_tags($post->post_content), // Cleaned content.
-                'id' => get_the_ID($post),
+                'id' => $post->ID,
                 'date' => get_the_date('c', $post),
             ];
             $this->sendJsonResponse($data, WP_Http::BAD_REQUEST);
