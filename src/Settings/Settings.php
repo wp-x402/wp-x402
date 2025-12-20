@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TheFrosty\WpX402\Settings;
 
@@ -10,6 +12,8 @@ use Dwnload\WpSettingsApi\Settings\FieldTypes;
 use Dwnload\WpSettingsApi\Settings\SectionManager;
 use Dwnload\WpSettingsApi\SettingsApiFactory;
 use Dwnload\WpSettingsApi\WpSettingsApi;
+use Multicoin\AddressValidator\CurrencyFactory;
+use Multicoin\AddressValidator\WalletAddressValidator;
 use TheFrosty\WpUtilities\Plugin\AbstractHookProvider;
 use TheFrosty\WpX402\Paywall\PaywallInterface;
 use function __;
@@ -17,6 +21,7 @@ use function array_unshift;
 use function esc_attr__;
 use function esc_html__;
 use function menu_page_url;
+use function sanitize_text_field;
 use function sprintf;
 
 /**
@@ -63,7 +68,6 @@ class Settings extends AbstractHookProvider
 
     /**
      * Initiate our setting to the Section & Field Manager classes.
-     *
      * SettingField requires the following settings (passes as an array or set explicitly):
      * [
      *  SettingField::NAME
@@ -72,7 +76,6 @@ class Settings extends AbstractHookProvider
      *  SettingField::TYPE
      *  SettingField::SECTION_ID
      * ]
-     *
      * @param SectionManager $section_manager
      * @param FieldManager $field_manager
      * @param WpSettingsApi $wp_settings_api
@@ -104,6 +107,17 @@ class Settings extends AbstractHookProvider
                 SettingField::DESC => esc_html__('Merchant Wallet Address.', 'wp-x402'),
                 SettingField::DEFAULT => PaywallInterface::TESTNET_WALLET,
                 SettingField::TYPE => FieldTypes::FIELD_TYPE_TEXT,
+                SettingField::SANITIZE => static function (mixed $value): string {
+                    $validator = new WalletAddressValidator(CurrencyFactory::createRegistry());
+                    if (
+                        $validator->validate($value, 'eth') ||
+                        $validator->validate($value, 'sol')
+                    ) {
+                        return sanitize_text_field($value);
+                    }
+
+                    return '';
+                },
                 SettingField::SECTION_ID => $settings_section_id,
             ])
         );
@@ -115,7 +129,10 @@ class Settings extends AbstractHookProvider
                 SettingField::DESC => sprintf(
                     __('Price (<abbr title="%s">USDC</abbr>).', 'wp-x402'),
                     // phpcs:ignore Generic.Files.LineLength.TooLong
-                    __('USDC is a cryptocurrency stablecoin which is issued by Circle. It is pegged to the United States dollar, and is distinct from a central bank digital currency.', 'wp-x402')
+                    __(
+                        'USDC is a cryptocurrency stablecoin which is issued by Circle. It is pegged to the United States dollar, and is distinct from a central bank digital currency.',
+                        'wp-x402'
+                    )
                 ),
                 SettingField::DEFAULT => PaywallInterface::DEFAULT_PRICE,
                 SettingField::TYPE => FieldTypes::FIELD_TYPE_NUMBER,
