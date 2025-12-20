@@ -12,8 +12,8 @@ use Dwnload\WpSettingsApi\Settings\FieldTypes;
 use Dwnload\WpSettingsApi\Settings\SectionManager;
 use Dwnload\WpSettingsApi\SettingsApiFactory;
 use Dwnload\WpSettingsApi\WpSettingsApi;
-use Multicoin\AddressValidator\WalletAddressValidator;
 use TheFrosty\WpUtilities\Plugin\AbstractContainerProvider;
+use TheFrosty\WpX402\Api\Api;
 use TheFrosty\WpX402\Paywall\PaywallInterface;
 use TheFrosty\WpX402\ServiceProvider;
 use function __;
@@ -109,13 +109,7 @@ class Settings extends AbstractContainerProvider
                 SettingField::TYPE => FieldTypes::FIELD_TYPE_TEXT,
                 SettingField::SANITIZE => function (mixed $value): string {
                     $validator = $this->getContainer()?->get(ServiceProvider::WALLET_ADDRESS_VALIDATOR);
-                    if (
-                        $validator instanceof WalletAddressValidator &&
-                        (
-                            $validator->validate($value, 'eth') ||
-                            $validator->validate($value, 'sol')
-                        )
-                    ) {
+                    if (Api::isValidWallet($validator, $value)) {
                         return sanitize_text_field($value);
                     }
 
