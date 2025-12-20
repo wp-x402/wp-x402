@@ -39,6 +39,6 @@ $plugin
     ->add(new DisablePluginUpdateCheck())
     ->add(new Middleware\Middleware())
     ->add(new Paywall\ForBots($container))
-    ->add(new Settings())
+    ->add(new Settings($container))
     ->add(new WpSettingsApi(Settings::factory(VERSION)))
     ->initialize();
