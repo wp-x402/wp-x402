@@ -137,6 +137,7 @@ class Settings extends AbstractHookProvider
                 ),
                 SettingField::DEFAULT => PaywallInterface::DEFAULT_PRICE,
                 SettingField::TYPE => FieldTypes::FIELD_TYPE_NUMBER,
+                SettingField::SIZE => 'small',
                 SettingField::ATTRIBUTES => [
                     'min' => '0.01',
                     'step' => '0.01',
