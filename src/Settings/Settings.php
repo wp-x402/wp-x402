@@ -128,8 +128,8 @@ class Settings extends AbstractHookProvider
                 SettingField::LABEL => esc_html__('Price', 'wp-x402'),
                 SettingField::DESC => sprintf(
                     __('Price (<abbr title="%s">USDC</abbr>).', 'wp-x402'),
-                    // phpcs:ignore Generic.Files.LineLength.TooLong
                     __(
+                    // phpcs:ignore Generic.Files.LineLength.TooLong
                         'USDC is a cryptocurrency stablecoin which is issued by Circle. It is pegged to the United States dollar, and is distinct from a central bank digital currency.',
                         'wp-x402'
                     )
