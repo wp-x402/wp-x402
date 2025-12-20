@@ -102,7 +102,7 @@ class Settings extends AbstractHookProvider
                 SettingField::NAME => self::WALLET,
                 SettingField::LABEL => esc_html__('Wallet', 'wp-x402'),
                 SettingField::DESC => esc_html__('Merchant Wallet Address.', 'wp-x402'),
-                SettingField::DEFAULT => '',
+                SettingField::DEFAULT => PaywallInterface::TESTNET_WALLET,
                 SettingField::TYPE => FieldTypes::FIELD_TYPE_TEXT,
                 SettingField::SECTION_ID => $settings_section_id,
             ])
