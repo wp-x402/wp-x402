@@ -33,12 +33,13 @@ if (is_readable(__DIR__ . '/vendor/autoload.php')) {
 const VERSION = '0.1.0';
 
 $plugin = PluginFactory::create('wp-x402');
-$plugin->getContainer()['request'] = static fn(): Request => Request::createFromGlobals();
+$container = $plugin->getContainer();
+$container['request'] = static fn(): Request => Request::createFromGlobals();
 
 $plugin
     ->add(new DisablePluginUpdateCheck())
-    ->add(new Content\Payment($plugin->getContainer()))
     ->add(new Middleware\Middleware())
+    ->add(new Paywall\ForBots($container))
     ->add(new Settings())
     ->add(new WpSettingsApi(Settings::factory(VERSION)))
     ->initialize();

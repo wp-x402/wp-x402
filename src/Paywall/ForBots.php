@@ -2,14 +2,8 @@
 
 declare(strict_types=1);
 
-namespace TheFrosty\WpX402\Content;
+namespace TheFrosty\WpX402\Paywall;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use TheFrosty\WpUtilities\Api\WpRemote;
-use TheFrosty\WpUtilities\Plugin\AbstractContainerProvider;
-use TheFrosty\WpUtilities\Plugin\HttpFoundationRequestInterface;
-use TheFrosty\WpUtilities\Plugin\HttpFoundationRequestTrait;
 use TheFrosty\WpX402\Api\Api;
 use TheFrosty\WpX402\Api\Bots;
 use TheFrosty\WpX402\Telemetry\EventType;
@@ -20,6 +14,7 @@ use function get_post;
 use function get_the_date;
 use function get_the_ID;
 use function get_the_title;
+use function is_attachment;
 use function is_singular;
 use function is_wp_error;
 use function sprintf;
@@ -30,21 +25,17 @@ use function TheFrosty\WpX402\getPrice;
 use function TheFrosty\WpX402\getWallet;
 use function TheFrosty\WpX402\telemetry;
 use function wp_remote_retrieve_response_code;
-use const FILTER_VALIDATE_BOOL;
 
 /**
  * Class Payment
- * @package TheFrosty\WpX402\Content
+ * @package TheFrosty\WpX402\Paywall
  */
-class Payment extends AbstractContainerProvider implements HttpFoundationRequestInterface
+class ForBots extends AbstractPaywall
 {
 
-    use HttpFoundationRequestTrait, WpRemote;
-
-    public const float DEFAULT_PRICE = 0.01;
-    public const string TESTNET_ASSET = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'; // phpcs:ignore
-    public const string TESTNET_WALLET = '0x505bc35f0a83c9ed06c6f94e68f0f86cf2812a6b'; // phpcs:ignore
-
+    /**
+     * Add class hooks.
+     */
     public function addHooks(): void
     {
         $this->addAction('template_redirect', [$this, 'templateRedirect']);
@@ -57,27 +48,18 @@ class Payment extends AbstractContainerProvider implements HttpFoundationRequest
      */
     protected function templateRedirect(): void
     {
-        if (is_admin() || !is_singular()) {
+        if (is_admin() || (!is_singular() || is_attachment())) {
             return;
         }
 
-        $request = $this->getRequest();
-        $is_bot_param = filter_var($request?->query->get('bot'), FILTER_VALIDATE_BOOL) === true;
-        $user_agent = $request?->server->get('HTTP_USER_AGENT', '');
-
-        // --- SEO WHITELIST ---
-        // Allow Googlebot (Search Indexing) to access content for free.
-        // BUT block Google-Extended (AI Training) -> they must pay.
-        if (stripos($user_agent, 'Googlebot') !== false && stripos($user_agent, 'Google-Extended') === false) {
-            return;
-        }
+        $user_agent = $this->getRequest()?->server->get('HTTP_USER_AGENT', '');
 
         $agents = Bots::getAgents();
         if (!$agents) {
             return;
         }
 
-        $is_bot_agent = (bool)$request?->query->get('fakeBot', false);
+        $is_bot_agent = false;
         foreach (array_keys($agents) as $agent) {
             if (stripos($user_agent, $agent) !== false) {
                 $is_bot_agent = true;
@@ -85,7 +67,7 @@ class Payment extends AbstractContainerProvider implements HttpFoundationRequest
             }
         }
 
-        if (!$is_bot_param && !$is_bot_agent) {
+        if (!$is_bot_agent) {
             return;
         }
 
@@ -93,7 +75,7 @@ class Payment extends AbstractContainerProvider implements HttpFoundationRequest
         $url = Api::getApiUrl();
 
         // 3. Check for Payment Header.
-        $payment_hash = $this->getPaymentHash($request);
+        $payment_hash = $this->getPaymentHash();
 
         // Scenario A: No Payment Hash -> Return 402 Offer.
         if (!$payment_hash) {
@@ -108,13 +90,13 @@ class Payment extends AbstractContainerProvider implements HttpFoundationRequest
                 'description' => 'Payment required.',
             ];
 
-            (new JsonResponse($data, WP_Http::PAYMENT_REQUIRED))->send();
+            $this->sendJsonResponse($data, WP_Http::PAYMENT_REQUIRED);
             // Telemetry: Impression.
             telemetry(EventType::REQUIRED, ['url' => get_permalink()]);
             exitOrThrow();
         }
 
-        // Scenario B: Verify Payment Hash with Brain (Backend).
+        // Scenario B: Verify Payment Hash.
         $response = Api::wpRemote($url, [Api::ACTION => Api::ACTION_VERIFY, 'paymentHash' => $payment_hash]);
 
         if (is_wp_error($response)) {
@@ -122,7 +104,7 @@ class Payment extends AbstractContainerProvider implements HttpFoundationRequest
             $data = [
                 'error' => sprintf('Bad request: %s', $response->get_error_message()),
             ];
-            (new JsonResponse($data, WP_Http::BAD_REQUEST))->send();
+            $this->sendJsonResponse($data, WP_Http::BAD_REQUEST);
             exitOrThrow();
         }
 
@@ -138,7 +120,7 @@ class Payment extends AbstractContainerProvider implements HttpFoundationRequest
                 'id' => get_the_ID($post),
                 'date' => get_the_date('c', $post),
             ];
-            (new JsonResponse($data, WP_Http::BAD_REQUEST))->send();
+            $this->sendJsonResponse($data, WP_Http::BAD_REQUEST);
 
             // Telemetry: Success.
             telemetry(EventType::SUCCESS, ['hash' => $payment_hash]);
@@ -148,21 +130,10 @@ class Payment extends AbstractContainerProvider implements HttpFoundationRequest
         // Payment Invalid.
         status_header(WP_Http::PAYMENT_REQUIRED);
         $data = ['error' => 'Payment Invalid or Expired'];
-        (new JsonResponse($data, WP_Http::PAYMENT_REQUIRED))->send();
+        $this->sendJsonResponse($data, WP_Http::PAYMENT_REQUIRED);
 
         // Telemetry: Failed.
         telemetry(EventType::FAILED, ['hash' => $payment_hash, 'code' => $response_code]);
         exitOrThrow();
-    }
-
-    protected function getPaymentHash(Request|null $request): ?string
-    {
-        if ($request?->server->has('HTTP_X_PAYMENT_HASH')) {
-            return $request?->server->get('HTTP_X_PAYMENT_HASH');
-        }
-        if ($request?->server->has('HTTP_X_PAYMENT')) {
-            return $request?->server->get('HTTP_X_PAYMENT');
-        }
-        return null;
     }
 }

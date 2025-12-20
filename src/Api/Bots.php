@@ -20,8 +20,7 @@ class Bots extends AbstractSingleton
 
     use TransientsTrait;
 
-    // phpcs:ignore Generic.Files.LineLength.TooLong
-    protected const string ROBOTS = 'https://raw.githubusercontent.com/ai-robots-txt/ai.robots.txt/refs/heads/main/robots.json';
+    protected const string ROBOTS = 'ai-robots-txt/ai.robots.txt/refs/heads/main/robots.json';
     protected const string PREFIX = '_x402_agents_';
 
     /**
@@ -31,10 +30,10 @@ class Bots extends AbstractSingleton
     public static function getAgents(): ?array
     {
         $instance = self::getInstance();
-        $transient = $instance->getTransientKey(self::ROBOTS, self::PREFIX);
+        $transient = $instance->getTransientKey(self::getRobotsUrl(), self::PREFIX);
         $robots = $instance->getTransient($transient);
         if (!$robots) {
-            $response = wp_remote_get(self::ROBOTS);
+            $response = wp_remote_get(self::getRobotsUrl());
             if (!is_wp_error($response)) {
                 try {
                     $robots = json_decode(wp_remote_retrieve_body($response), true, flags: JSON_THROW_ON_ERROR);
@@ -46,5 +45,14 @@ class Bots extends AbstractSingleton
         }
 
         return $robots;
+    }
+
+    /**
+     * Return the raw GitHub User Content URL.
+     * @return string
+     */
+    private static function getRobotsUrl(): string
+    {
+        return sprintf('https://raw.githubusercontent.com/%s', self::ROBOTS);
     }
 }

@@ -6,22 +6,20 @@ namespace TheFrosty\WpX402;
 
 use Dwnload\WpSettingsApi\Api\Options;
 use TheFrosty\WpX402\Api\Api;
-use TheFrosty\WpX402\Content\Payment;
 use TheFrosty\WpX402\Middleware\Middleware;
 use TheFrosty\WpX402\Middleware\Rejection;
+use TheFrosty\WpX402\Paywall\PaywallInterface;
 use TheFrosty\WpX402\Settings\Settings;
 use TheFrosty\WpX402\Telemetry\EventType;
+use function sanitize_text_field;
 
 /**
  * Return the price setting.
- * @return float|string
+ * @return string
  */
-function getPrice(): float|string
+function getPrice(): string
 {
-    return getSetting(
-        Settings::PRICE,
-        Payment::DEFAULT_PRICE
-    );
+    return sanitize_text_field(getSetting(Settings::PRICE, PaywallInterface::DEFAULT_PRICE));
 }
 
 /**
@@ -30,7 +28,7 @@ function getPrice(): float|string
  */
 function getWallet(): string
 {
-    return getSetting(Settings::WALLET, Payment::TESTNET_WALLET);
+    return sanitize_text_field(getSetting(Settings::WALLET, PaywallInterface::TESTNET_WALLET));
 }
 
 /**
