@@ -12,10 +12,10 @@ use Dwnload\WpSettingsApi\Settings\FieldTypes;
 use Dwnload\WpSettingsApi\Settings\SectionManager;
 use Dwnload\WpSettingsApi\SettingsApiFactory;
 use Dwnload\WpSettingsApi\WpSettingsApi;
-use Multicoin\AddressValidator\CurrencyFactory;
 use Multicoin\AddressValidator\WalletAddressValidator;
-use TheFrosty\WpUtilities\Plugin\AbstractHookProvider;
+use TheFrosty\WpUtilities\Plugin\AbstractContainerProvider;
 use TheFrosty\WpX402\Paywall\PaywallInterface;
+use TheFrosty\WpX402\ServiceProvider;
 use function __;
 use function array_unshift;
 use function esc_attr__;
@@ -28,7 +28,7 @@ use function sprintf;
  * Class Settings
  * @package TheFrosty\WpLoginLocker\Settings
  */
-class Settings extends AbstractHookProvider
+class Settings extends AbstractContainerProvider
 {
     public const string GENERAL_SETTINGS = self::PREFIX . 'general_settings';
     public const string WALLET = 'wallet';
@@ -107,11 +107,14 @@ class Settings extends AbstractHookProvider
                 SettingField::DESC => esc_html__('Merchant Wallet Address.', 'wp-x402'),
                 SettingField::DEFAULT => PaywallInterface::TESTNET_WALLET,
                 SettingField::TYPE => FieldTypes::FIELD_TYPE_TEXT,
-                SettingField::SANITIZE => static function (mixed $value): string {
-                    $validator = new WalletAddressValidator(CurrencyFactory::createRegistry());
+                SettingField::SANITIZE => function (mixed $value): string {
+                    $validator = $this->getContainer()?->get(ServiceProvider::WALLET_ADDRESS_VALIDATOR);
                     if (
-                        $validator->validate($value, 'eth') ||
-                        $validator->validate($value, 'sol')
+                        $validator instanceof WalletAddressValidator &&
+                        (
+                            $validator->validate($value, 'eth') ||
+                            $validator->validate($value, 'sol')
+                        )
                     ) {
                         return sanitize_text_field($value);
                     }
