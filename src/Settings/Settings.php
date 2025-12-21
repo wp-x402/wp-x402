@@ -206,12 +206,12 @@ class Settings extends AbstractContainerProvider
                         'wp-x402'
                     )
                 ),
-                SettingField::DEFAULT => PaywallInterface::DEFAULT_PRICE,
+                SettingField::DEFAULT => (string)PaywallInterface::DEFAULT_PRICE,
                 SettingField::TYPE => FieldTypes::FIELD_TYPE_NUMBER,
                 SettingField::SIZE => 'small',
                 SettingField::ATTRIBUTES => [
-                    'min' => '0.01',
-                    'step' => '0.01',
+                    'min' => '0.001',
+                    'step' => '0.001',
                 ],
                 SettingField::SECTION_ID => $settings_section_id,
             ])
