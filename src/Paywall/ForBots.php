@@ -6,7 +6,10 @@ namespace TheFrosty\WpX402\Paywall;
 
 use TheFrosty\WpX402\Api\Api;
 use TheFrosty\WpX402\Api\Bots;
+use TheFrosty\WpX402\Networks\Mainnet;
+use TheFrosty\WpX402\Networks\Testnet;
 use TheFrosty\WpX402\ServiceProvider;
+use TheFrosty\WpX402\Settings\Settings;
 use TheFrosty\WpX402\Telemetry\EventType;
 use WP_Http;
 use function array_keys;
@@ -21,8 +24,6 @@ use function sprintf;
 use function status_header;
 use function strip_tags;
 use function TheFrosty\WpUtilities\exitOrThrow;
-use function TheFrosty\WpX402\getPrice;
-use function TheFrosty\WpX402\getWallet;
 use function TheFrosty\WpX402\telemetry;
 use function wp_remote_retrieve_response_code;
 
@@ -72,7 +73,7 @@ class ForBots extends AbstractPaywall
         }
 
         // 2. Validate the wallet once more.
-        $wallet = getWallet();
+        $wallet = Settings::getWallet();
         $validator = $this->getContainer()?->get(ServiceProvider::WALLET_ADDRESS_VALIDATOR);
         if (!Api::isValidWallet($validator, $wallet)) {
             return; // @TODO we should look into doing something if a wallet is invalid
@@ -84,13 +85,15 @@ class ForBots extends AbstractPaywall
         // Scenario A: No Payment Hash -> Return 402 Offer.
         if (!$payment_hash) {
             status_header(WP_Http::PAYMENT_REQUIRED);
+            $is_mainnet = Settings::isMainnet();
 
             $data = [
-                'maxAmountRequired' => getPrice(),
+                'scheme' => 'exact',
+                'price' => Settings::getPrice(),
                 'payTo' => $wallet,
                 'resource' => get_permalink(),
-                'asset' => self::TESTNET_ASSET, // USDC on Base.
-                'network' => 'base-mainnet',
+                'asset' => $is_mainnet ? Mainnet::ASSET_BASE->value : Testnet::ASSET_BASE->value, // USDC on Base.
+                'network' => $is_mainnet ? Mainnet::BASE->value : Testnet::BASE->value,
                 'description' => 'Payment required.',
             ];
 
