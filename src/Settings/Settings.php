@@ -73,7 +73,8 @@ class Settings extends AbstractContainerProvider
      */
     public static function getWallet(): string
     {
-        return sanitize_text_field(self::getSetting(self::WALLET, ''));
+        $account = self::getSetting(self::ACCOUNT, array_key_first((new static())->getAccounts()));
+        return sanitize_text_field(self::getSetting(sprintf(self::WALLET, $account), ''));
     }
 
     /**
