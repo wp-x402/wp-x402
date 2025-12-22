@@ -18,6 +18,5 @@ enum Mainnet: string implements Network
     case ASSET_ETHEREUM = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'; // phpcs:ignore
 
     case BASE = 'eip155:8453';
-    case ETHEREUM = 'eip155:1';
     case SOLANA = 'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp';
 }

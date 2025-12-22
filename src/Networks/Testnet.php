@@ -19,5 +19,5 @@ enum Testnet: string implements Network
     case ASSET_ETHEREUM = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'; // phpcs:ignore
 
     case BASE = 'eip155:84532';
-    case DEVNET = 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1';
+    case SOLANA = 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1';
 }
