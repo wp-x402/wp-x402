@@ -37,8 +37,8 @@ $container->register(new ServiceProvider());
 
 $plugin
     ->add(new DisablePluginUpdateCheck())
-    ->add(new Middleware\Middleware())
     ->add(new Paywall\ForBots($container))
     ->add(new Settings($container))
     ->add(new WpSettingsApi(Settings::factory(VERSION)))
+    ->addOnHook(Middleware\Middleware::class, 'rest_api_init')
     ->initialize();
