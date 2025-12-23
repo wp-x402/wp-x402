@@ -73,7 +73,7 @@ class Settings extends AbstractContainerProvider
      */
     public static function getWallet(): string
     {
-        $account = self::getSetting(self::ACCOUNT, array_key_first((new static())->getAccounts()));
+        $account = self::getSetting(self::ACCOUNT, array_key_first(self::getAccounts()));
         return sanitize_text_field(self::getSetting(sprintf(self::WALLET, $account), ''));
     }
 
@@ -178,7 +178,7 @@ class Settings extends AbstractContainerProvider
             ])
         );
 
-        $accounts = $this->getAccounts();
+        $accounts = self::getAccounts();
 
         $field_manager->addField(
             new SettingField([
@@ -196,7 +196,7 @@ class Settings extends AbstractContainerProvider
             ])
         );
 
-        foreach ($this->getAccounts() as $account => $label) {
+        foreach (self::getAccounts() as $account => $label) {
             $field_manager->addField(
                 new SettingField([
                     SettingField::NAME => sprintf(self::WALLET, $account),
@@ -315,7 +315,7 @@ SCRIPT;
             'invalid_wallet_address',
             sprintf(
                 esc_html__('%s: Invalid or unsupported wallet address.', 'wp-x402'),
-                $this->getAccounts()[str_replace('_wallet', '', $key)]
+                self::getAccounts()[str_replace('_wallet', '', $key)]
             ),
         );
 
@@ -326,7 +326,7 @@ SCRIPT;
      * Get allowed accounts.
      * @return array
      */
-    private function getAccounts(): array
+    private static function getAccounts(): array
     {
         return [
             'base' => esc_html__('EVM', 'wp-x402'),
