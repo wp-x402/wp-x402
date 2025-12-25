@@ -112,8 +112,6 @@ class ForBots extends AbstractPaywall
                 ],
             ],
         ]);
-        $this->sendJsonResponse($payment_required->toArray());
-        exit;
 
         // 3. Check for Payment Header.
         $paymentSignature = $this->getPaymentSignature();
