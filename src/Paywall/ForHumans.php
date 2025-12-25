@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TheFrosty\WpX402\Paywall;
 
 use TheFrosty\WpX402\Api\Api;
-use TheFrosty\WpX402\Api\Bots;
 use TheFrosty\WpX402\Models\PaymentRequired;
 use TheFrosty\WpX402\Models\PaymentRequired\Accepts;
 use TheFrosty\WpX402\Models\PaymentRequired\UrlResource;
@@ -13,29 +12,8 @@ use TheFrosty\WpX402\Networks\Mainnet;
 use TheFrosty\WpX402\Networks\Testnet;
 use TheFrosty\WpX402\ServiceProvider;
 use TheFrosty\WpX402\Settings\Settings;
-use TheFrosty\WpX402\Telemetry\EventType;
-use WP_Http;
-use function array_keys;
-use function array_rand;
-use function base64_encode;
 use function esc_html__;
 use function get_permalink;
-use function get_post;
-use function get_the_date;
-use function get_the_title;
-use function is_attachment;
-use function is_singular;
-use function is_wp_error;
-use function json_encode;
-use function sprintf;
-use function status_header;
-use function str_word_count;
-use function strip_tags;
-use function TheFrosty\WpUtilities\exitOrThrow;
-use function TheFrosty\WpX402\telemetry;
-use function wp_remote_retrieve_body;
-use function wp_remote_retrieve_response_code;
-use const JSON_THROW_ON_ERROR;
 
 /**
  * Class ForHumans
@@ -90,7 +68,7 @@ class ForHumans extends AbstractPaywall
                 ],
             ],
         ]);
-        
+
         return <<<HTML
             <div style="filter:blur(5px); text-shadow:0 0 2px #000; z-index:-999">$content</div>
             HTML;
