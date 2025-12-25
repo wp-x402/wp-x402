@@ -202,7 +202,7 @@ class Settings extends AbstractContainerProvider
                     SettingField::NAME => sprintf(self::WALLET, $account),
                     SettingField::LABEL => sprintf('%s %s', $label, esc_html__('Wallet', 'wp-x402')),
                     SettingField::DESC => esc_html__('Merchant Wallet Address.', 'wp-x402'),
-                    SettingField::DEFAULT => Testnet::tryValue(sprintf('ASSET_%s', strtoupper($account))),
+                    SettingField::DEFAULT => '',
                     SettingField::TYPE => FieldTypes::FIELD_TYPE_TEXT,
                     SettingField::SANITIZE => function (mixed $value, array $settings, string $key): string {
                         return $this->validateWallet($value, $settings, $key);
