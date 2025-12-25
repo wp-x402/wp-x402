@@ -46,7 +46,7 @@ class Api
      */
     public static function getApiUrl(): string
     {
-        return home_url('/api/x402');
+        return home_url('/x402/api');
     }
 
     /**
