@@ -26,6 +26,10 @@ class Api
     public const string ACTION = 'wp_x402';
     public const string ACTION_COLLECT = 'collect';
     public const string ACTION_VERIFY = 'verify';
+    public const string HEADER_PAYMENT_RESPONSE = 'PAYMENT-RESPONSE';
+    public const string HEADER_PAYMENT_REQUIRED = 'PAYMENT-REQUIRED';
+    public const string HEADER_PAYMENT_SIGNATURE = 'HTTP_PAYMENT-SIGNATURE';
+    public const string PAYMENT_SIGNATURE = 'paymentSignature';
 
     final public const string USER_AGENT = 'WpX402';
 

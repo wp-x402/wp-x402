@@ -10,7 +10,9 @@ use TheFrosty\WpUtilities\Api\WpRemote;
 use TheFrosty\WpUtilities\Plugin\AbstractContainerProvider;
 use TheFrosty\WpUtilities\Plugin\HttpFoundationRequestInterface;
 use TheFrosty\WpUtilities\Plugin\HttpFoundationRequestTrait;
+use TheFrosty\WpX402\Api\Api;
 use WP_Http;
+use function base64_encode;
 
 /**
  * Class AbstractPaywall
@@ -24,19 +26,25 @@ abstract class AbstractPaywall extends AbstractContainerProvider implements
     use HttpFoundationRequestTrait, WpRemote;
 
     /**
-     * Return the payment hash from the request.
+     * Return the payment signature from the request.
      * @return string|null
      */
-    protected function getPaymentHash(): ?string
+    protected function getPaymentSignature(): ?string
     {
-        if ($this->getRequest()?->server->has('HTTP_X_PAYMENT_HASH')) {
-            return $this->getRequest()?->server->get('HTTP_X_PAYMENT_HASH');
-        }
-        if ($this->getRequest()?->server->has('HTTP_X_PAYMENT')) {
-            return $this->getRequest()?->server->get('HTTP_X_PAYMENT');
-        }
-        if ($this->getRequest()?->server->has('HTTP_X_PAYMENT_RESPONSE')) {
-            return $this->getRequest()?->server->get('HTTP_X_PAYMENT_RESPONSE');
+        if ($this->getRequest()?->server->has(Api::HEADER_PAYMENT_SIGNATURE)) {
+            $signature = $this->getRequest()?->server->get(Api::HEADER_PAYMENT_SIGNATURE, '');
+            // Simple Base64 Validation...
+            $decode = base64_decode($signature, true);
+
+            if ($decode === false) {
+                return null;
+            }
+
+            // Check if signature and new base64 are identical.
+            if (base64_encode($decode) !== $signature) {
+                return null;
+            }
+            return $signature;
         }
 
         return null;

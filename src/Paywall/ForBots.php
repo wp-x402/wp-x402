@@ -6,6 +6,9 @@ namespace TheFrosty\WpX402\Paywall;
 
 use TheFrosty\WpX402\Api\Api;
 use TheFrosty\WpX402\Api\Bots;
+use TheFrosty\WpX402\Models\PaymentRequired;
+use TheFrosty\WpX402\Models\PaymentRequired\Accepts;
+use TheFrosty\WpX402\Models\PaymentRequired\UrlResource;
 use TheFrosty\WpX402\Networks\Mainnet;
 use TheFrosty\WpX402\Networks\Testnet;
 use TheFrosty\WpX402\ServiceProvider;
@@ -13,6 +16,8 @@ use TheFrosty\WpX402\Settings\Settings;
 use TheFrosty\WpX402\Telemetry\EventType;
 use WP_Http;
 use function array_keys;
+use function base64_encode;
+use function esc_html__;
 use function get_permalink;
 use function get_post;
 use function get_the_date;
@@ -20,6 +25,7 @@ use function get_the_title;
 use function is_attachment;
 use function is_singular;
 use function is_wp_error;
+use function json_encode;
 use function sprintf;
 use function status_header;
 use function strip_tags;
@@ -27,6 +33,7 @@ use function TheFrosty\WpUtilities\exitOrThrow;
 use function TheFrosty\WpX402\telemetry;
 use function wp_remote_retrieve_body;
 use function wp_remote_retrieve_response_code;
+use const JSON_THROW_ON_ERROR;
 
 /**
  * Class Payment
@@ -47,6 +54,7 @@ class ForBots extends AbstractPaywall
      * Redirect based on current template conditions.
      * @throws \JsonException
      * @throws \TheFrosty\WpUtilities\Exceptions\TerminationException
+     * @throws \Exception
      */
     protected function templateRedirect(): void
     {
@@ -80,40 +88,61 @@ class ForBots extends AbstractPaywall
             return; // @TODO we should look into doing something if a wallet is invalid
         }
 
+        $is_mainnet = Settings::isMainnet();
+
+        $payment_required = new PaymentRequired([
+            PaymentRequired::VERSION => 2,
+            PaymentRequired::ERROR => esc_html__('PAYMENT-SIGNATURE header is required', 'wp-x402'),
+            PaymentRequired::RESOURCE => [
+                UrlResource::URL => get_permalink(),
+                UrlResource::DESCRIPTION => '',
+                UrlResource::MIME_TYPE => 'text/html',
+            ],
+            PaymentRequired::ACCEPTS => [
+                Accepts::SCHEME => 'exact',
+                Accepts::NETWORK => $is_mainnet ? Mainnet::BASE->value : Testnet::BASE->value,
+                Accepts::AMOUNT => Settings::getPrice(),
+                Accepts::ASSET => $is_mainnet ? Mainnet::ASSET_BASE->value : Testnet::ASSET_BASE->value,
+                Accepts::PAY_TO => $wallet,
+                Accepts::MAX_TIMEOUT_SECONDS => 60,
+                Accepts::EXTRA => [
+                    'name' => 'USDC',
+                    'version' => 2,
+                ],
+            ],
+        ]);
+
         // 3. Check for Payment Header.
-        $payment_hash = $this->getPaymentHash();
+        $paymentSignature = $this->getPaymentSignature();
 
         // Scenario A: No Payment Hash -> Return 402 Offer.
-        if (!$payment_hash) {
+        if (!$paymentSignature) {
             status_header(WP_Http::PAYMENT_REQUIRED);
-            $is_mainnet = Settings::isMainnet();
 
-            $data = [
-                'scheme' => 'exact',
-                'price' => Settings::getPrice(),
-                'payTo' => $wallet,
-                'resource' => get_permalink(),
-                'asset' => $is_mainnet ? Mainnet::ASSET_BASE->value : Testnet::ASSET_BASE->value, // USDC on Base.
-                'network' => $is_mainnet ? Mainnet::BASE->value : Testnet::BASE->value,
-                'description' => 'Payment required.',
-            ];
-
-            $this->sendJsonResponse($data, WP_Http::PAYMENT_REQUIRED);
+            $this->sendJsonResponse(
+                [PaymentRequired::ERROR => esc_html__('Payment required', 'wp-x402')],
+                WP_Http::PAYMENT_REQUIRED,
+                [
+                    Api::HEADER_PAYMENT_REQUIRED => base64_encode(
+                        json_encode($payment_required->toArray(), JSON_THROW_ON_ERROR)
+                    ),
+                ]
+            );
             // Telemetry: Impression.
-            telemetry(EventType::REQUIRED, ['url' => get_permalink()]);
+            telemetry(EventType::REQUIRED, [UrlResource::URL => $payment_required->getResource()->getUrl()]);
             exitOrThrow();
         }
 
         // Scenario B: Verify Payment Hash.
         $response = Api::wpRemote(
             Api::getApiUrl(),
-            [Api::ACTION => Api::ACTION_VERIFY, 'paymentHash' => $payment_hash]
+            [Api::ACTION => Api::ACTION_VERIFY, Api::PAYMENT_SIGNATURE => $paymentSignature]
         );
 
         if (is_wp_error($response)) {
             status_header(WP_Http::BAD_REQUEST);
             $data = [
-                'error' => sprintf('Bad request: %s', $response->get_error_message()),
+                PaymentRequired::ERROR => sprintf('Bad request: %s', $response->get_error_message()),
             ];
             $this->sendJsonResponse($data, WP_Http::BAD_REQUEST);
             exitOrThrow();
@@ -132,23 +161,31 @@ class ForBots extends AbstractPaywall
                 'date' => get_the_date('c', $post),
             ];
             $data = apply_filters('wp_x402_response_data', $data, $post);
-            $headers = [
-                'X-PAYMENT-RESPONSE' => wp_remote_retrieve_body($response),
-            ];
-            $this->sendJsonResponse($data, WP_Http::ACCEPTED, $headers);
+            $this->sendJsonResponse($data, WP_Http::OK, [
+                Api::HEADER_PAYMENT_RESPONSE => wp_remote_retrieve_body($response),
+            ]);
 
             // Telemetry: Success.
-            telemetry(EventType::SUCCESS, ['hash' => $payment_hash]);
+            telemetry(EventType::SUCCESS, ['signature' => $paymentSignature]);
             exitOrThrow();
         }
 
         // Payment Invalid.
         status_header(WP_Http::PAYMENT_REQUIRED);
-        $data = ['error' => 'Payment Invalid or Expired'];
-        $this->sendJsonResponse($data, WP_Http::PAYMENT_REQUIRED);
+        $payment_required->setError(esc_html__('Payment Invalid or Expired.', 'wp-x402'));
+
+        $this->sendJsonResponse(
+            [PaymentRequired::ERROR => $payment_required->getError()],
+            WP_Http::PAYMENT_REQUIRED,
+            [
+                Api::HEADER_PAYMENT_RESPONSE => base64_encode(
+                    json_encode($payment_required->toArray(), JSON_THROW_ON_ERROR)
+                ),
+            ]
+        );
 
         // Telemetry: Failed.
-        telemetry(EventType::FAILED, ['hash' => $payment_hash, 'code' => $response_code]);
+        telemetry(EventType::FAILED, ['signature' => $paymentSignature, 'code' => $response_code]);
         exitOrThrow();
     }
 }
