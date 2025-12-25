@@ -82,6 +82,11 @@ class PaymentRequired extends BaseModel
         $this->payload = new Payload($payload);
     }
 
+    public function toArray(): array
+    {
+        return array_filter(parent::toArray());
+    }
+
     protected function getSerializableFields(): array
     {
         return [

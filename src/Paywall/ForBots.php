@@ -63,6 +63,7 @@ class ForBots extends AbstractPaywall
         }
 
         $user_agent = $this->getRequest()?->server->get('HTTP_USER_AGENT', '');
+        $is_fake_bot = $this->getRequest()?->query->has('fakeBot');
 
         $agents = Bots::getAgents();
         if (!$agents) {
@@ -77,7 +78,7 @@ class ForBots extends AbstractPaywall
             }
         }
 
-        if (!$is_bot_agent) {
+        if (!$is_bot_agent && !$is_fake_bot) {
             return;
         }
 
