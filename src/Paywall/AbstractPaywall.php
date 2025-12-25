@@ -46,10 +46,11 @@ abstract class AbstractPaywall extends AbstractContainerProvider implements
      * Return a JSON Response.
      * @param mixed|null $data
      * @param int $status
+     * @param array $headers
      * @return Response
      */
-    protected function sendJsonResponse(mixed $data = null, int $status = WP_Http::OK): Response
+    protected function sendJsonResponse(mixed $data = null, int $status = WP_Http::OK, array $headers = []): Response
     {
-        return (new JsonResponse($data, $status))->send();
+        return (new JsonResponse($data, $status, $headers))->send();
     }
 }
