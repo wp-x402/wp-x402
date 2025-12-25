@@ -29,7 +29,6 @@ use function menu_page_url;
 use function sanitize_text_field;
 use function sprintf;
 use function str_replace;
-use function strtoupper;
 use function wp_add_inline_script;
 use function wp_enqueue_script;
 use function wp_register_script;
