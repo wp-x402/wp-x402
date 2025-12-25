@@ -28,7 +28,7 @@ class Accepts extends BaseModel
         return $this->scheme;
     }
 
-    public function setScheme(string $scheme): void
+    public function setScheme(string $scheme = 'exact'): void
     {
         $this->scheme = $scheme;
     }
