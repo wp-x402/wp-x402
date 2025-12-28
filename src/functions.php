@@ -51,5 +51,5 @@ function telemetry(EventType $event_type, array $meta = []): void
         'meta' => $meta,
     ];
 
-    Api::wpRemote(Api::getApiUrl(), $data);
+    Api::wpRemote(Api::getApiUrl(Api::ACTION_COLLECT), $data);
 }

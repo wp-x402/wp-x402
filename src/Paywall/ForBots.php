@@ -137,7 +137,7 @@ class ForBots extends AbstractPaywall
 
         // Scenario B: Verify Payment Hash.
         $response = Api::wpRemote(
-            Api::getApiUrl(),
+            Api::getApiUrl(Api::ACTION_VERIFY),
             [Api::ACTION => Api::ACTION_VERIFY, Api::PAYMENT_SIGNATURE => $paymentSignature]
         );
 
