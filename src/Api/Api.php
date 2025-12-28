@@ -68,6 +68,7 @@ class Api
     {
         $defaults = [
             'body' => json_encode($data, JSON_THROW_ON_ERROR),
+            'headers' => ['Content-Type' => 'application/json'],
             'timeout' => 7,
             'user-agent' => sprintf('%s/%s; %s', self::USER_AGENT, VERSION, esc_url(get_bloginfo('url'))),
         ];
