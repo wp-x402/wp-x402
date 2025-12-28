@@ -7,6 +7,7 @@ namespace TheFrosty\WpX402\Api;
 use Multicoin\AddressValidator\WalletAddressValidator;
 use TheFrosty\WpUtilities\Api\WpRemote;
 use WP_Error;
+use function apply_filters;
 use function array_merge;
 use function esc_url;
 use function json_encode;
@@ -30,6 +31,7 @@ class Api
     public const string HEADER_PAYMENT_REQUIRED = 'PAYMENT-REQUIRED';
     public const string HEADER_PAYMENT_SIGNATURE = 'HTTP_PAYMENT-SIGNATURE';
     public const string PAYMENT_SIGNATURE = 'paymentSignature';
+    final public const string URL = 'https://api.wp-x402.com';
 
     final public const string USER_AGENT = 'WpX402';
 
@@ -50,7 +52,7 @@ class Api
      */
     public static function getApiUrl(): string
     {
-        return home_url('/x402/api');
+        return apply_filters('wp_x402_api_url', self::URL);
     }
 
     /**
