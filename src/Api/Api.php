@@ -48,11 +48,12 @@ class Api
 
     /**
      * Get the API URL.
+     * @param string|null $action
      * @return string
      */
-    public static function getApiUrl(): string
+    public static function getApiUrl(?string $action = ''): string
     {
-        return apply_filters('wp_x402_api_url', self::URL);
+        return sprintf('%s/%s', apply_filters('wp_x402_api_url', self::URL), $action ?? '');
     }
 
     /**
