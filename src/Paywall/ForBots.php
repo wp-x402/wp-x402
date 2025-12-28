@@ -91,6 +91,7 @@ class ForBots extends AbstractPaywall
 
         $is_mainnet = Settings::isMainnet();
 
+        // @TODO: Need to pass in correct Mainnet/Testnet->(BASE|SOLANA) based on user select.
         $payment_required = new PaymentRequired([
             PaymentRequired::ERROR => esc_html__('PAYMENT-SIGNATURE header is required', 'wp-x402'),
             PaymentRequired::RESOURCE => [
@@ -131,7 +132,13 @@ class ForBots extends AbstractPaywall
                 ]
             );
             // Telemetry: Impression.
-            telemetry(EventType::REQUIRED, [UrlResource::URL => $payment_required->getResource()->getUrl()]);
+            telemetry(
+                EventType::REQUIRED,
+                [
+                    Accepts::NETWORK => $is_mainnet ? Mainnet::BASE->value : Testnet::BASE->value,
+                    UrlResource::URL => $payment_required->getResource()->getUrl()
+                ]
+            );
             exitOrThrow();
         }
 
