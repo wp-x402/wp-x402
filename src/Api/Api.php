@@ -30,6 +30,8 @@ class Api
     public const string HEADER_PAYMENT_RESPONSE = 'PAYMENT-RESPONSE';
     public const string HEADER_PAYMENT_REQUIRED = 'PAYMENT-REQUIRED';
     public const string HEADER_PAYMENT_SIGNATURE = 'PAYMENT-SIGNATURE';
+    public const string HEADER_X_PAYMENT = 'X-PAYMENT';
+    public const string PAYMENT_REQUIREMENTS = 'paymentRequirements';
     public const string PAYMENT_SIGNATURE = 'paymentSignature';
     final public const string URL = 'https://api.wp-x402.com';
 
