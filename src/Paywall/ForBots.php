@@ -136,7 +136,7 @@ class ForBots extends AbstractPaywall
                 EventType::REQUIRED,
                 [
                     Accepts::NETWORK => $is_mainnet ? Mainnet::BASE->value : Testnet::BASE->value,
-                    UrlResource::URL => $payment_required->getResource()->getUrl()
+                    UrlResource::URL => $payment_required->getResource()->getUrl(),
                 ]
             );
             exitOrThrow();
@@ -145,7 +145,13 @@ class ForBots extends AbstractPaywall
         // Scenario B: Verify Payment Hash.
         $response = Api::wpRemote(
             Api::getApiUrl(Api::ACTION_VERIFY),
-            [Api::ACTION => Api::ACTION_VERIFY, Api::PAYMENT_SIGNATURE => $paymentSignature]
+            [
+                Api::ACTION => Api::ACTION_VERIFY,
+                Api::PAYMENT_REQUIREMENTS => base64_encode(
+                    json_encode($payment_required->toArray(), JSON_THROW_ON_ERROR)
+                ),
+                Api::PAYMENT_SIGNATURE => $paymentSignature,
+            ]
         );
 
         if (is_wp_error($response)) {
@@ -179,12 +185,16 @@ class ForBots extends AbstractPaywall
             exitOrThrow();
         }
 
-        // Payment Invalid.
+        // Payment Invalid (likely).
         status_header(WP_Http::PAYMENT_REQUIRED);
         $payment_required->setError(esc_html__('Payment Invalid or Expired.', 'wp-x402'));
 
+        $data = [PaymentRequired::ERROR => $payment_required->getError()];
+        if (true) { // @TODO: Create a debug function for local development.
+            $data['extra'] = ['code' => $response_code, 'message' => json_decode(wp_remote_retrieve_body($response))];
+        }
         $this->sendJsonResponse(
-            [PaymentRequired::ERROR => $payment_required->getError()],
+            $data,
             WP_Http::PAYMENT_REQUIRED,
             [
                 Api::HEADER_PAYMENT_RESPONSE => base64_encode(
