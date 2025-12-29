@@ -31,20 +31,23 @@ abstract class AbstractPaywall extends AbstractContainerProvider implements
      */
     protected function getPaymentSignature(): ?string
     {
-        if ($this->getRequest()?->headers->has(Api::HEADER_PAYMENT_SIGNATURE)) {
-            $signature = $this->getRequest()?->headers->get(Api::HEADER_PAYMENT_SIGNATURE, '');
-            // Simple Base64 Validation...
-            $decode = base64_decode($signature, true);
+        $headers = [Api::HEADER_X_PAYMENT, Api::HEADER_PAYMENT_SIGNATURE];
+        foreach ($headers as $header) {
+            if ($this->getRequest()?->headers->has($header)) {
+                $signature = $this->getRequest()?->headers->get($header, '');
+                // Simple Base64 Validation...
+                $decode = base64_decode($signature, true);
 
-            if ($decode === false) {
-                return null;
-            }
+                if ($decode === false) {
+                    continue;
+                }
 
-            // Check if signature and new base64 are identical.
-            if (base64_encode($decode) !== $signature) {
-                return null;
+                // Check if signature and new base64 are identical.
+                if (base64_encode($decode) !== $signature) {
+                    continue;
+                }
+                return $signature;
             }
-            return $signature;
         }
 
         return null;
