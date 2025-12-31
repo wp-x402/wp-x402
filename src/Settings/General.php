@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace TheFrosty\WpX402\Settings;
 
 use Dwnload\WpSettingsApi\Api\Options;
-use Dwnload\WpSettingsApi\Api\PluginSettings;
 use Dwnload\WpSettingsApi\Api\SettingField;
 use Dwnload\WpSettingsApi\Api\SettingSection;
 use Dwnload\WpSettingsApi\Settings\FieldManager;
 use Dwnload\WpSettingsApi\Settings\FieldTypes;
 use Dwnload\WpSettingsApi\Settings\SectionManager;
-use Dwnload\WpSettingsApi\SettingsApiFactory;
 use Dwnload\WpSettingsApi\WpSettingsApi;
 use NumberFormatter;
 use TheFrosty\WpUtilities\Plugin\AbstractContainerProvider;
