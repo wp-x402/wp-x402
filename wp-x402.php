@@ -42,6 +42,7 @@ $plugin
 
 if (is_admin()) {
     $plugin
+        ->add(new Settings\Factory($container))
         ->add(new Settings\General($container))
         ->add($container->get(ServiceProvider::WP_SETTINGS_API));
 }

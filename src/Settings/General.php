@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace TheFrosty\WpX402\Settings;
 
-use Dwnload\WpSettingsApi\Api\Options;
 use Dwnload\WpSettingsApi\Api\SettingField;
 use Dwnload\WpSettingsApi\Api\SettingSection;
 use Dwnload\WpSettingsApi\Settings\FieldManager;
 use Dwnload\WpSettingsApi\Settings\FieldTypes;
 use Dwnload\WpSettingsApi\Settings\SectionManager;
 use Dwnload\WpSettingsApi\WpSettingsApi;
-use NumberFormatter;
 use TheFrosty\WpUtilities\Plugin\AbstractContainerProvider;
 use TheFrosty\WpX402\Api\Api;
 use TheFrosty\WpX402\Networks\Mainnet;
@@ -20,16 +18,10 @@ use TheFrosty\WpX402\Paywall\PaywallInterface;
 use TheFrosty\WpX402\ServiceProvider;
 use function __;
 use function add_settings_error;
-use function array_unshift;
-use function esc_attr__;
 use function esc_html__;
-use function menu_page_url;
 use function sanitize_text_field;
 use function sprintf;
 use function str_replace;
-use function wp_add_inline_script;
-use function wp_enqueue_script;
-use function wp_register_script;
 
 /**
  * Class General
@@ -51,8 +43,6 @@ class General extends AbstractContainerProvider
     public function addHooks(): void
     {
         $this->addAction(WpSettingsApi::HOOK_INIT, [$this, 'init'], 10, 3);
-        $this->addAction('admin_enqueue_scripts', [$this, 'adminScripts']);
-        $this->addFilter('plugin_action_links_' . $this->getPlugin()->getBasename(), [$this, 'addSettingsLink']);
     }
 
     /**
@@ -104,7 +94,7 @@ class General extends AbstractContainerProvider
             ])
         );
 
-        $accounts = self::getAccounts();
+        $accounts = Setting::getAccounts();
 
         $field_manager->addField(
             new SettingField([
@@ -122,7 +112,7 @@ class General extends AbstractContainerProvider
             ])
         );
 
-        foreach (self::getAccounts() as $account => $label) {
+        foreach ($accounts as $account => $label) {
             $field_manager->addField(
                 new SettingField([
                     SettingField::NAME => sprintf(self::WALLET, $account),
@@ -160,61 +150,6 @@ class General extends AbstractContainerProvider
                 SettingField::SECTION_ID => $settings_section_id,
             ])
         );
-    }
-
-    protected function adminScripts(string $hook): void
-    {
-        if ($hook !== 'settings_page_' . $this->getPlugin()->getSlug()) {
-            return;
-        }
-
-        wp_register_script($this->getPlugin()->getSlug(), '');
-        wp_enqueue_script($this->getPlugin()->getSlug());
-        $data = <<<'SCRIPT'
-document.addEventListener('DOMContentLoaded', function () {
-  const select = document.querySelector('select[name*="account"]')
-  if (select) {
-    const wallets = document.querySelectorAll('input[name*="_wallet"]')
-    wallets.forEach((wallet) => {
-      if (!wallet.id.includes(select.value)) {
-        wallet.closest('tr').style.display = 'none'
-      }
-    })
-  }
-  select.addEventListener('change', function () {
-    const wallets = document.querySelectorAll('input[name*="_wallet"]')
-    wallets.forEach((wallet) => {
-      if (!wallet.id.includes(this.value)) {
-        wallet.closest('tr').style.display = 'none'
-        return
-      }
-      wallet.closest('tr').style.display = ''
-    })
-  })
-})
-
-SCRIPT;
-        wp_add_inline_script($this->getPlugin()->getSlug(), $data);
-    }
-
-    /**
-     * Add settings page link to the plugins page.
-     * @param array $actions
-     * @return array
-     */
-    protected function addSettingsLink(array $actions): array
-    {
-        array_unshift(
-            $actions,
-            sprintf(
-                '<a href="%s" aria-label="%s">%s</a>',
-                menu_page_url($this->getPlugin()->getSlug(), false),
-                esc_attr__('Settings for x402', 'wp-x402'),
-                esc_html__('Settings', 'wp-x402')
-            ),
-        );
-
-        return $actions;
     }
 
     /**
