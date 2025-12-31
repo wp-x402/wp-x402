@@ -8,6 +8,7 @@ use Dwnload\WpSettingsApi\Api\PluginSettings;
 use Dwnload\WpSettingsApi\SettingsApiFactory;
 use TheFrosty\WpUtilities\Plugin\Plugin;
 use function esc_html__;
+use const TheFrosty\WpX402\VERSION;
 
 /**
  * Class Factory
@@ -31,7 +32,7 @@ class Factory
             'menu-title' => esc_html__('x402 Settings', 'wp-x402'),
             'page-title' => esc_html__('x402 Settings', 'wp-x402'),
             'prefix' => self::PREFIX,
-            'version' => '1.0.0-20230221',
+            'version' => VERSION,
         ]);
     }
 }
