@@ -7,7 +7,7 @@ namespace TheFrosty\WpX402;
 use TheFrosty\WpX402\Api\Api;
 use TheFrosty\WpX402\Middleware\Middleware;
 use TheFrosty\WpX402\Middleware\Rejection;
-use TheFrosty\WpX402\Settings\Settings;
+use TheFrosty\WpX402\Settings\General;
 use TheFrosty\WpX402\Telemetry\EventType;
 
 /**
@@ -46,8 +46,8 @@ function telemetry(EventType $event_type, array $meta = []): void
         Api::ACTION => Api::ACTION_COLLECT,
         'event_type' => $event_type->value,
         'project_type' => 'wordpress-plugin',
-        'wallet' => Settings::getWallet(),
-        'amount' => Settings::getPrice(),
+        'wallet' => General::getWallet(),
+        'amount' => General::getPrice(),
         'meta' => $meta,
     ];
 

@@ -11,7 +11,7 @@ use TheFrosty\WpX402\Models\PaymentRequired\UrlResource;
 use TheFrosty\WpX402\Networks\Mainnet;
 use TheFrosty\WpX402\Networks\Testnet;
 use TheFrosty\WpX402\ServiceProvider;
-use TheFrosty\WpX402\Settings\Settings;
+use TheFrosty\WpX402\Settings\General;
 use function esc_html__;
 use function get_permalink;
 
@@ -38,13 +38,13 @@ class ForHumans extends AbstractPaywall
      */
     protected function theContent(string $content): string
     {
-        $wallet = Settings::getWallet();
+        $wallet = General::getWallet();
         $validator = $this->getContainer()?->get(ServiceProvider::WALLET_ADDRESS_VALIDATOR);
         if (!Api::isValidWallet($validator, $wallet)) {
             return $content; // @TODO we should look into doing something if a wallet is invalid
         }
 
-        $is_mainnet = Settings::isMainnet();
+        $is_mainnet = General::isMainnet();
 
         $payment_required = new PaymentRequired([
             PaymentRequired::ERROR => esc_html__('PAYMENT-SIGNATURE header is required', 'wp-x402'),
@@ -57,7 +57,7 @@ class ForHumans extends AbstractPaywall
                 [
                     Accepts::SCHEME => 'exact',
                     Accepts::NETWORK => $is_mainnet ? Mainnet::BASE->value : Testnet::BASE->value,
-                    Accepts::AMOUNT => Settings::getPrice(),
+                    Accepts::AMOUNT => General::getPrice(),
                     Accepts::ASSET => $is_mainnet ? Mainnet::ASSET_BASE->value : Testnet::ASSET_BASE->value,
                     Accepts::PAY_TO => $wallet,
                     Accepts::MAX_TIMEOUT_SECONDS => 60,
