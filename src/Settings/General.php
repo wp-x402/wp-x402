@@ -44,56 +44,6 @@ class General extends AbstractContainerProvider
     public const string WALLET = '%s_wallet';
 
     /**
-     * Return the wallet setting.
-     * @return string
-     */
-    public static function getWallet(): string
-    {
-        $account = self::getSetting(self::ACCOUNT, array_key_first(self::getAccounts()));
-        return sanitize_text_field(self::getSetting(sprintf(self::WALLET, $account), ''));
-    }
-
-    /**
-     * Return the network setting.
-     * @return string
-     */
-    public static function getNetwork(): string
-    {
-        return sanitize_text_field(self::getSetting(self::NETWORK, 'testnet'));
-    }
-
-    /**
-     * Return the price setting.
-     * @return string
-     */
-    public static function getPrice(): string
-    {
-        $price = (float)self::getSetting(self::PRICE, PaywallInterface::DEFAULT_PRICE);
-        $formatter = new NumberFormatter('en_US', NumberFormatter::CURRENCY);
-        return sanitize_text_field($formatter->formatCurrency($price, 'USD'));
-    }
-
-    /**
-     * Is the Mainnet selected?
-     * @return bool
-     */
-    public static function isMainnet(): bool
-    {
-        return self::getNetwork() === Mainnet::class;
-    }
-
-    /**
-     * Get our option key in our general setting index.
-     * @param string $key
-     * @param mixed|null $default
-     * @return mixed
-     */
-    public static function getSetting(string $key, mixed $default = null): mixed
-    {
-        return Options::getOption($key, self::GENERAL_SETTINGS, $default);
-    }
-
-    /**
      * Register our callback to the WP Settings API action hook
      * `WpSettingsApi::ACTION_PREFIX . 'init'`. This custom action passes three parameters (two prior to version 2.7)
      * so you have to register a priority and the parameter count.
@@ -291,22 +241,10 @@ SCRIPT;
             'invalid_wallet_address',
             sprintf(
                 esc_html__('%s: Invalid or unsupported wallet address.', 'wp-x402'),
-                self::getAccounts()[str_replace('_wallet', '', $key)]
+                Setting::getAccounts()[str_replace('_wallet', '', $key)]
             ),
         );
 
         return '';
-    }
-
-    /**
-     * Get allowed accounts.
-     * @return array
-     */
-    private static function getAccounts(): array
-    {
-        return [
-            'base' => esc_html__('EVM', 'wp-x402'),
-            'solana' => esc_html__('Solana', 'wp-x402'),
-        ];
     }
 }
