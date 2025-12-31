@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TheFrosty\WpX402;
 
-use Dwnload\WpSettingsApi\Api\PluginSettings;
 use Dwnload\WpSettingsApi\WpSettingsApi;
 use Multicoin\AddressValidator\CurrencyFactory;
 use Multicoin\AddressValidator\WalletAddressValidator;
