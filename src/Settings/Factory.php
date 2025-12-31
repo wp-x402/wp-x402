@@ -28,8 +28,8 @@ class Factory
             'domain' => $plugin->getSlug(),
             'file' => $plugin->getFile(),
             'menu-slug' => $plugin->getSlug(),
-            'menu-title' => esc_html__('x402 Settings', 'crain'),
-            'page-title' => esc_html__('x402 Settings', 'crain'),
+            'menu-title' => esc_html__('x402 Settings', 'wp-x402'),
+            'page-title' => esc_html__('x402 Settings', 'wp-x402'),
             'prefix' => self::PREFIX,
             'version' => '1.0.0-20230221',
         ]);
