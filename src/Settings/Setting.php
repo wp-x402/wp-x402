@@ -76,6 +76,6 @@ class Setting
      */
     protected static function getGeneralSetting(string $key, mixed $default = null): mixed
     {
-        return Options::getOption($key, General::GENERAL_SETTINGS, $default);
+        return Options::getOption($key, General::SECTION_ID, $default);
     }
 }

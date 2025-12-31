@@ -29,7 +29,7 @@ use function str_replace;
  */
 class General extends AbstractContainerProvider
 {
-    public const string GENERAL_SETTINGS = Factory::PREFIX . 'general_settings';
+    public const string SECTION_ID = Factory::PREFIX . 'general_settings';
     public const string ACCOUNT = 'account';
     public const string NETWORK = 'network';
     public const string PRICE = 'price';
@@ -74,7 +74,7 @@ class General extends AbstractContainerProvider
          */
         $settings_section_id = $section_manager->addSection(
             new SettingSection([
-                SettingSection::SECTION_ID => self::GENERAL_SETTINGS, // Unique section ID.
+                SettingSection::SECTION_ID => self::SECTION_ID, // Unique section ID.
                 SettingSection::SECTION_TITLE => 'General Settings',
             ])
         );
