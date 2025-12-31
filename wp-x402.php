@@ -18,8 +18,10 @@ namespace TheFrosty\WpX402;
 
 defined('ABSPATH') || exit;
 
+use Dwnload\WpSettingsApi\WpSettingsApi;
 use TheFrosty\WpUtilities\Plugin\PluginFactory;
 use TheFrosty\WpUtilities\WpAdmin\DisablePluginUpdateCheck;
+use TheFrosty\WpX402\Settings\Factory;
 use function defined;
 use function is_readable;
 
@@ -43,8 +45,11 @@ $plugin
 if (is_admin()) {
     $plugin
         ->add(new Settings\Factory($container))
-        ->add(new Settings\General($container))
-        ->add($container->get(ServiceProvider::WP_SETTINGS_API));
+        ->add(new Settings\General($container));
 }
+
+add_action('init', static function () use ($plugin): void {
+    $plugin->addOnHook(WpSettingsApi::class, admin_only: true, args: [Factory::getPluginSettings($plugin)]);
+}, 2);
 
 $plugin->initialize();
