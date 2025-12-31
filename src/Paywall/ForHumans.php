@@ -32,6 +32,7 @@ class ForHumans extends AbstractPaywall
 
     /**
      * Redirect based on current template conditions.
+     * @param string $content
      * @throws \JsonException
      * @throws \TheFrosty\WpUtilities\Exceptions\TerminationException
      * @throws \Exception
