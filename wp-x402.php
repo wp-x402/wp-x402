@@ -22,9 +22,11 @@ use Dwnload\EddSoftwareLicenseManager\Edd;
 use Dwnload\WpSettingsApi\WpSettingsApi;
 use TheFrosty\WpUtilities\Plugin\PluginFactory;
 use TheFrosty\WpUtilities\WpAdmin\DisablePluginUpdateCheck;
+use TheFrosty\WpX402\Api\Api;
 use TheFrosty\WpX402\Settings\Factory;
 use function defined;
 use function is_readable;
+use function sprintf;
 
 if (is_readable(__DIR__ . '/vendor/autoload.php')) {
     include_once __DIR__ . '/vendor/autoload.php';
@@ -54,5 +56,10 @@ if (is_admin()) {
 add_action('init', static function () use ($plugin): void {
     $plugin->addOnHook(WpSettingsApi::class, admin_only: true, args: [Factory::getPluginSettings($plugin)]);
 }, 2);
+
+add_filter('dwnload_api_remote_post_args', static function (array $args): array {
+    $args['user-agent'] = sprintf('%s/%s; %s', Api::USER_AGENT, VERSION, esc_url(get_bloginfo('url')));
+    return $args;
+});
 
 $plugin->initialize();
