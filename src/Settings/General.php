@@ -11,17 +11,12 @@ use Dwnload\WpSettingsApi\Settings\FieldTypes;
 use Dwnload\WpSettingsApi\Settings\SectionManager;
 use Dwnload\WpSettingsApi\WpSettingsApi;
 use TheFrosty\WpUtilities\Plugin\AbstractContainerProvider;
-use TheFrosty\WpX402\Api\Api;
 use TheFrosty\WpX402\Networks\Mainnet;
 use TheFrosty\WpX402\Networks\Testnet;
 use TheFrosty\WpX402\Paywall\PaywallInterface;
-use TheFrosty\WpX402\ServiceProvider;
 use function __;
-use function add_settings_error;
 use function esc_html__;
-use function sanitize_text_field;
 use function sprintf;
-use function str_replace;
 
 /**
  * Class General
@@ -29,6 +24,9 @@ use function str_replace;
  */
 class General extends AbstractContainerProvider
 {
+
+    use ValidateSetting;
+
     public const string SECTION_ID = Factory::PREFIX . 'general_settings';
     public const string ACCOUNT = 'account';
     public const string NETWORK = 'network';
@@ -150,36 +148,5 @@ class General extends AbstractContainerProvider
                 SettingField::SECTION_ID => $settings_section_id,
             ])
         );
-    }
-
-    /**
-     * Validate the wallet setting value.
-     * @param mixed $value The passed value.
-     * @param array $settings The settings $_POST array.
-     * @param string $key The current settings key.
-     * @return string
-     */
-    protected function validateWallet(mixed $value, array $settings, string $key): string
-    {
-        $validator = $this->getContainer()?->get(ServiceProvider::WALLET_ADDRESS_VALIDATOR);
-        if (Api::isValidWallet($validator, $value)) {
-            return sanitize_text_field($value);
-        }
-
-        // Don't add an error notice on empty value.
-        if ($value === '') {
-            return $value;
-        }
-
-        add_settings_error(
-            $key,
-            'invalid_wallet_address',
-            sprintf(
-                esc_html__('%s: Invalid or unsupported wallet address.', 'wp-x402'),
-                Setting::getAccounts()[str_replace('_wallet', '', $key)]
-            ),
-        );
-
-        return '';
     }
 }
