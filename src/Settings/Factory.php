@@ -61,29 +61,28 @@ class Factory extends AbstractContainerProvider
         wp_register_script($this->getPlugin()->getSlug(), '');
         wp_enqueue_script($this->getPlugin()->getSlug());
         $data = <<<'SCRIPT'
-document.addEventListener('DOMContentLoaded', function () {
-  const select = document.querySelector('select[name*="account"]')
-  if (select) {
-    const wallets = document.querySelectorAll('input[name*="_wallet"]')
-    wallets.forEach((wallet) => {
-      if (!wallet.id.includes(select.value)) {
-        wallet.closest('tr').style.display = 'none'
-      }
-    })
-  }
-  select.addEventListener('change', function () {
-    const wallets = document.querySelectorAll('input[name*="_wallet"]')
-    wallets.forEach((wallet) => {
-      if (!wallet.id.includes(this.value)) {
-        wallet.closest('tr').style.display = 'none'
-        return
-      }
-      wallet.closest('tr').style.display = ''
-    })
-  })
-})
-
-SCRIPT;
+            document.addEventListener('DOMContentLoaded', function () {
+              const select = document.querySelector('select[name*="account"]')
+              if (select) {
+                const wallets = document.querySelectorAll('input[name*="_wallet"]')
+                wallets.forEach((wallet) => {
+                  if (!wallet.id.includes(select.value)) {
+                    wallet.closest('tr').style.display = 'none'
+                  }
+                })
+              }
+              select.addEventListener('change', function () {
+                const wallets = document.querySelectorAll('input[name*="_wallet"]')
+                wallets.forEach((wallet) => {
+                  if (!wallet.id.includes(this.value)) {
+                    wallet.closest('tr').style.display = 'none'
+                    return
+                  }
+                  wallet.closest('tr').style.display = ''
+                })
+              })
+            })
+            SCRIPT;
         wp_add_inline_script($this->getPlugin()->getSlug(), $data);
     }
 
