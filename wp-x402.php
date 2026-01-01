@@ -18,6 +18,7 @@ namespace TheFrosty\WpX402;
 
 defined('ABSPATH') || exit;
 
+use Dwnload\EddSoftwareLicenseManager\Edd;
 use Dwnload\WpSettingsApi\WpSettingsApi;
 use TheFrosty\WpUtilities\Plugin\PluginFactory;
 use TheFrosty\WpUtilities\WpAdmin\DisablePluginUpdateCheck;
@@ -38,6 +39,8 @@ $container->register(new ServiceProvider());
 
 $plugin
     ->add(new DisablePluginUpdateCheck())
+    ->add(new Edd\LicenseManager($plugin, $container->get(ServiceProvider::LICENSE_DATA)))
+    ->add(new Edd\PluginUpdater('https://wp-x402.com/', __FILE__, $container->get(ServiceProvider::LICENSE_DATA)))
     ->add(new Paywall\ForBots($container))
     ->add(new Paywall\ForHumans($container))
     ->addOnHook(Middleware\Middleware::class, 'rest_api_init');
