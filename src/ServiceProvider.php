@@ -38,7 +38,7 @@ class ServiceProvider implements ServiceProviderInterface
             return [
                 'api_url' => 'https://wp-x402.com/edd-sl-api',
                 'license' => $license[PLUGIN_SLUG]['license'] ?? '',
-                'item_name' => 'x402 for WordPress', // Name of this plugin (matching your EDD Download title).
+                'item_name' => 'x402', // Name of this plugin (matching your EDD Download title).
                 'author' => 'wp-x402',
                 'item_id' => 14,
                 'version' => VERSION,
