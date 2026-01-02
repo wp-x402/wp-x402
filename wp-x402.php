@@ -20,6 +20,8 @@ defined('ABSPATH') || exit;
 
 use Dwnload\EddSoftwareLicenseManager\Edd;
 use Dwnload\WpSettingsApi\WpSettingsApi;
+use Exception;
+use ReflectionClass;
 use TheFrosty\WpUtilities\Plugin\PluginFactory;
 use TheFrosty\WpUtilities\WpAdmin\DisablePluginUpdateCheck;
 use TheFrosty\WpX402\Settings\Factory;
@@ -56,3 +58,12 @@ add_action('init', static function () use ($plugin): void {
 }, 2);
 
 $plugin->initialize();
+
+register_activation_hook(__FILE__, static function () use ($plugin): void {
+    $manager = $plugin->getInit()->getWpHookObject(Edd\LicenseManager::class);
+    try {
+        (new ReflectionClass($manager))->getMethod('scheduleEvents')->invoke($manager);
+    } catch (Exception) {
+        // Nothing to do.
+    }
+});
