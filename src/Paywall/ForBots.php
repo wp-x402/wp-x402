@@ -12,7 +12,7 @@ use TheFrosty\WpX402\Models\PaymentRequired\UrlResource;
 use TheFrosty\WpX402\Networks\Mainnet;
 use TheFrosty\WpX402\Networks\Testnet;
 use TheFrosty\WpX402\ServiceProvider;
-use TheFrosty\WpX402\Settings\Settings;
+use TheFrosty\WpX402\Settings\Setting;
 use TheFrosty\WpX402\Telemetry\EventType;
 use WP_Http;
 use function array_keys;
@@ -83,13 +83,13 @@ class ForBots extends AbstractPaywall
         }
 
         // 2. Validate the wallet once more.
-        $wallet = Settings::getWallet();
+        $wallet = Setting::getWallet();
         $validator = $this->getContainer()?->get(ServiceProvider::WALLET_ADDRESS_VALIDATOR);
         if (!Api::isValidWallet($validator, $wallet)) {
             return; // @TODO we should look into doing something if a wallet is invalid
         }
 
-        $is_mainnet = Settings::isMainnet();
+        $is_mainnet = Setting::isMainnet();
 
         // @TODO: Need to pass in correct Mainnet/Testnet->(BASE|SOLANA) based on user select.
         $payment_required = new PaymentRequired([
@@ -103,7 +103,7 @@ class ForBots extends AbstractPaywall
                 [
                     Accepts::SCHEME => 'exact',
                     Accepts::NETWORK => $is_mainnet ? Mainnet::BASE->value : Testnet::BASE->value,
-                    Accepts::AMOUNT => Settings::getPrice(),
+                    Accepts::AMOUNT => Setting::getPrice(),
                     Accepts::ASSET => $is_mainnet ? Mainnet::ASSET_BASE->value : Testnet::ASSET_BASE->value,
                     Accepts::PAY_TO => $wallet,
                     Accepts::MAX_TIMEOUT_SECONDS => 60,
