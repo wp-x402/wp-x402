@@ -37,8 +37,6 @@ jobs:
         with:
           php-version: 8.3
           coverage: none
-        env:
-          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build project for production
         run: |
