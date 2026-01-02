@@ -12,6 +12,7 @@ use Pimple\Container as PimpleContainer;
 use Pimple\ServiceProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use TheFrosty\WpX402\Settings\Factory;
+use function apply_filters;
 use function is_array;
 
 /**
@@ -53,7 +54,7 @@ class ServiceProvider implements ServiceProviderInterface
             return $data;
         }
         $data = [
-            'api_url' => 'https://wp-x402.com/',
+            'api_url' => apply_filters('wp_x402_license_api_url', 'https://wp-x402.com/'),
             'license' => License::getLicenseKey(PLUGIN_SLUG),
             'item_name' => 'x402', // Name of this plugin (matching your EDD Download title).
             'author' => 'wp-x402',
