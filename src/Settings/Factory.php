@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TheFrosty\WpX402\Settings;
+namespace WpX402\WpX402\Settings;
 
 use Dwnload\WpSettingsApi\Api\PluginSettings;
 use Dwnload\WpSettingsApi\SettingsApiFactory;
@@ -11,11 +11,11 @@ use TheFrosty\WpUtilities\Plugin\Plugin;
 use function array_unshift;
 use function esc_html__;
 use function sprintf;
-use const TheFrosty\WpX402\VERSION;
+use const WpX402\WpX402\VERSION;
 
 /**
  * Class Factory
- * @package TheFrosty\WpX402\Settings
+ * @package WpX402\WpX402\Settings
  */
 class Factory extends AbstractContainerProvider
 {

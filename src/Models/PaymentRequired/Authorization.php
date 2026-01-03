@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace TheFrosty\WpX402\Models\PaymentRequired;
+namespace WpX402\WpX402\Models\PaymentRequired;
 
 use TheFrosty\WpUtilities\Models\BaseModel;
 
 /**
  * Class Authorization
- * @package TheFrosty\WpX402\Models\PaymentRequired
+ * @package WpX402\WpX402\Models\PaymentRequired
  */
 class Authorization extends BaseModel
 {

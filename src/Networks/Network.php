@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace TheFrosty\WpX402\Networks;
+namespace WpX402\WpX402\Networks;
 
 /**
  * Interface Network
- * @package TheFrosty\WpX402\Networks
+ * @package WpX402\WpX402\Networks
  */
 interface Network
 {

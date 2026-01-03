@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace TheFrosty\WpX402\Models\PaymentRequired;
+namespace WpX402\WpX402\Models\PaymentRequired;
 
 use TheFrosty\WpUtilities\Models\BaseModel;
 
 /**
  * Class UrlResource
- * @package TheFrosty\WpX402\Models
+ * @package WpX402\WpX402\Models
  */
 class UrlResource extends BaseModel
 {

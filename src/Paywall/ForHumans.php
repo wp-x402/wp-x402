@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace TheFrosty\WpX402\Paywall;
+namespace WpX402\WpX402\Paywall;
 
-use TheFrosty\WpX402\Api\Api;
-use TheFrosty\WpX402\Models\PaymentRequired;
-use TheFrosty\WpX402\Models\PaymentRequired\Accepts;
-use TheFrosty\WpX402\Models\PaymentRequired\UrlResource;
-use TheFrosty\WpX402\Networks\Mainnet;
-use TheFrosty\WpX402\Networks\Testnet;
-use TheFrosty\WpX402\ServiceProvider;
-use TheFrosty\WpX402\Settings\Setting;
+use WpX402\WpX402\Api\Api;
+use WpX402\WpX402\Models\PaymentRequired;
+use WpX402\WpX402\Models\PaymentRequired\Accepts;
+use WpX402\WpX402\Models\PaymentRequired\UrlResource;
+use WpX402\WpX402\Networks\Mainnet;
+use WpX402\WpX402\Networks\Testnet;
+use WpX402\WpX402\ServiceProvider;
+use WpX402\WpX402\Settings\Setting;
 use function esc_html__;
 use function get_permalink;
 
 /**
  * Class ForHumans
- * @package TheFrosty\WpX402\Paywall
+ * @package WpX402\WpX402\Paywall
  */
 class ForHumans extends AbstractPaywall
 {

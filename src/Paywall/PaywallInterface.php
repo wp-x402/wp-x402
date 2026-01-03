@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace TheFrosty\WpX402\Paywall;
+namespace WpX402\WpX402\Paywall;
 
 /**
  * Interface PaywallInterface
- * @package TheFrosty\WpX402\Paywall
+ * @package WpX402\WpX402\Paywall
  */
 interface PaywallInterface
 {

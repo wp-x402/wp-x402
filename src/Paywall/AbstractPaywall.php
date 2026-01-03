@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TheFrosty\WpX402\Paywall;
+namespace WpX402\WpX402\Paywall;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,13 +10,13 @@ use TheFrosty\WpUtilities\Api\WpRemote;
 use TheFrosty\WpUtilities\Plugin\AbstractContainerProvider;
 use TheFrosty\WpUtilities\Plugin\HttpFoundationRequestInterface;
 use TheFrosty\WpUtilities\Plugin\HttpFoundationRequestTrait;
-use TheFrosty\WpX402\Api\Api;
 use WP_Http;
+use WpX402\WpX402\Api\Api;
 use function base64_encode;
 
 /**
  * Class AbstractPaywall
- * @package TheFrosty\WpX402\Paywall
+ * @package WpX402\WpX402\Paywall
  */
 abstract class AbstractPaywall extends AbstractContainerProvider implements
     HttpFoundationRequestInterface,

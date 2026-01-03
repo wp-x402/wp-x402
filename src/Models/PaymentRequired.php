@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace TheFrosty\WpX402\Models;
+namespace WpX402\WpX402\Models;
 
 use TheFrosty\WpUtilities\Models\BaseModel;
-use TheFrosty\WpX402\Models\PaymentRequired\Accepts;
-use TheFrosty\WpX402\Models\PaymentRequired\Payload;
-use TheFrosty\WpX402\Models\PaymentRequired\UrlResource;
+use WpX402\WpX402\Models\PaymentRequired\Accepts;
+use WpX402\WpX402\Models\PaymentRequired\Payload;
+use WpX402\WpX402\Models\PaymentRequired\UrlResource;
 
 /**
  * Class PaymentRequired
- * @package TheFrosty\WpX402\Models
+ * @package WpX402\WpX402\Models
  */
 class PaymentRequired extends BaseModel
 {

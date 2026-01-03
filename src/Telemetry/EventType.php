@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TheFrosty\WpX402\Telemetry;
+namespace WpX402\WpX402\Telemetry;
 
 enum EventType: string
 {

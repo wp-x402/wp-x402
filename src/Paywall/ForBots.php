@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace TheFrosty\WpX402\Paywall;
+namespace WpX402\WpX402\Paywall;
 
-use TheFrosty\WpX402\Api\Api;
-use TheFrosty\WpX402\Api\Bots;
-use TheFrosty\WpX402\Models\PaymentRequired;
-use TheFrosty\WpX402\Models\PaymentRequired\Accepts;
-use TheFrosty\WpX402\Models\PaymentRequired\UrlResource;
-use TheFrosty\WpX402\Networks\Mainnet;
-use TheFrosty\WpX402\Networks\Testnet;
-use TheFrosty\WpX402\ServiceProvider;
-use TheFrosty\WpX402\Settings\Setting;
-use TheFrosty\WpX402\Telemetry\EventType;
 use WP_Http;
+use WpX402\WpX402\Api\Api;
+use WpX402\WpX402\Api\Bots;
+use WpX402\WpX402\Models\PaymentRequired;
+use WpX402\WpX402\Models\PaymentRequired\Accepts;
+use WpX402\WpX402\Models\PaymentRequired\UrlResource;
+use WpX402\WpX402\Networks\Mainnet;
+use WpX402\WpX402\Networks\Testnet;
+use WpX402\WpX402\ServiceProvider;
+use WpX402\WpX402\Settings\Setting;
+use WpX402\WpX402\Telemetry\EventType;
 use function array_keys;
 use function base64_encode;
 use function esc_html__;
@@ -30,14 +30,14 @@ use function sprintf;
 use function status_header;
 use function strip_tags;
 use function TheFrosty\WpUtilities\exitOrThrow;
-use function TheFrosty\WpX402\telemetry;
 use function wp_remote_retrieve_body;
 use function wp_remote_retrieve_response_code;
+use function WpX402\WpX402\telemetry;
 use const JSON_THROW_ON_ERROR;
 
 /**
  * Class ForBots
- * @package TheFrosty\WpX402\Paywall
+ * @package WpX402\WpX402\Paywall
  */
 class ForBots extends AbstractPaywall
 {

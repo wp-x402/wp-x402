@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TheFrosty\WpX402\Api;
+namespace WpX402\WpX402\Api;
 
 use JsonException;
 use TheFrosty\WpUtilities\Api\TransientsTrait;
@@ -13,7 +13,7 @@ use function wp_remote_retrieve_body;
 
 /**
  * Class Bots
- * @package TheFrosty\WpX402\Api
+ * @package WpX402\WpX402\Api
  */
 class Bots extends AbstractSingleton
 {

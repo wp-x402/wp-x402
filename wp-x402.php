@@ -14,7 +14,7 @@
  * Release Asset: true
  */
 
-namespace TheFrosty\WpX402;
+namespace WpX402\WpX402;
 
 defined('ABSPATH') || exit;
 
@@ -24,7 +24,7 @@ use Exception;
 use ReflectionClass;
 use TheFrosty\WpUtilities\Plugin\PluginFactory;
 use TheFrosty\WpUtilities\WpAdmin\DisablePluginUpdateCheck;
-use TheFrosty\WpX402\Settings\Factory;
+use WpX402\WpX402\Settings\Factory;
 use function defined;
 use function is_readable;
 

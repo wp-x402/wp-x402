@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace TheFrosty\WpX402;
+namespace WpX402\WpX402;
 
-use TheFrosty\WpX402\Api\Api;
-use TheFrosty\WpX402\Middleware\Middleware;
-use TheFrosty\WpX402\Middleware\Rejection;
-use TheFrosty\WpX402\Settings\Setting;
-use TheFrosty\WpX402\Telemetry\EventType;
+use WpX402\WpX402\Api\Api;
+use WpX402\WpX402\Middleware\Middleware;
+use WpX402\WpX402\Middleware\Rejection;
+use WpX402\WpX402\Settings\Setting;
+use WpX402\WpX402\Telemetry\EventType;
 
 /**
  * Returns the Middleware.

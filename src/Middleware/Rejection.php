@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TheFrosty\WpX402\Middleware;
+namespace WpX402\WpX402\Middleware;
 
 use TheFrosty\WpUtilities\Models\BaseModel;
 use WP_Http;

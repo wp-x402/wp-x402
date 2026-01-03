@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace TheFrosty\WpX402\Settings;
+namespace WpX402\WpX402\Settings;
 
-use TheFrosty\WpX402\Api\Api;
-use TheFrosty\WpX402\ServiceProvider;
+use WpX402\WpX402\Api\Api;
+use WpX402\WpX402\ServiceProvider;
 use function sprintf;
 use function str_replace;
 
 /**
  * Trait Validation
- * @package TheFrosty\WpX402\Settings
+ * @package WpX402\WpX402\Settings
  */
 trait ValidateSetting
 {
