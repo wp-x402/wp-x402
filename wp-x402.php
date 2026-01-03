@@ -8,8 +8,8 @@
  * Requires at least: 6.7
  * Tested up to: 6.9.0
  * Requires PHP: 8.3
- * Plugin URI: https://github.com/thefrosty/wp-x402
- * GitHub Plugin URI: https://github.com/thefrosty/wp-x402
+ * Plugin URI: https://github.com/wp-x402/wp-x402
+ * GitHub Plugin URI: https://github.com/wp-x402/wp-x402
  * Primary Branch: main
  * Release Asset: true
  */

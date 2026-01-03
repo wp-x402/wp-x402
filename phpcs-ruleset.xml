@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="WP-Login-Locker" namespace="TheFrosty\WpX402">
+<ruleset name="WP-x402" namespace="WpX402\WpX402">
 
     <description>Coding Standards for the WP x402 codebase.</description>
 

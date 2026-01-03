@@ -1,5 +1,5 @@
 {
-  "name": "thefrosty/wp-x402",
+  "name": "wp-x402/wp-x402",
   "type": "wordpress-plugin",
   "description": "A payments middleware for WordPress.",
   "license": "MIT",
