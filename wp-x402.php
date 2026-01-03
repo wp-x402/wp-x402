@@ -8,13 +8,13 @@
  * Requires at least: 6.7
  * Tested up to: 6.9.0
  * Requires PHP: 8.3
- * Plugin URI: https://github.com/thefrosty/wp-x402
- * GitHub Plugin URI: https://github.com/thefrosty/wp-x402
+ * Plugin URI: https://github.com/wp-x402/wp-x402
+ * GitHub Plugin URI: https://github.com/wp-x402/wp-x402
  * Primary Branch: main
  * Release Asset: true
  */
 
-namespace TheFrosty\WpX402;
+namespace WpX402\WpX402;
 
 defined('ABSPATH') || exit;
 
@@ -24,7 +24,7 @@ use Exception;
 use ReflectionClass;
 use TheFrosty\WpUtilities\Plugin\PluginFactory;
 use TheFrosty\WpUtilities\WpAdmin\DisablePluginUpdateCheck;
-use TheFrosty\WpX402\Settings\Factory;
+use WpX402\WpX402\Settings\Factory;
 use function defined;
 use function is_readable;
 

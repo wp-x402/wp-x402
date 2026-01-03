@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TheFrosty\WpX402\Api;
+namespace WpX402\WpX402\Api;
 
 use Multicoin\AddressValidator\WalletAddressValidator;
 use TheFrosty\WpUtilities\Api\WpRemote;
@@ -13,11 +13,11 @@ use function esc_url;
 use function json_encode;
 use function sprintf;
 use const JSON_THROW_ON_ERROR;
-use const TheFrosty\WpX402\VERSION;
+use const WpX402\WpX402\VERSION;
 
 /**
  * Class Api
- * @package TheFrosty\WpX402\Api
+ * @package WpX402\WpX402\Api
  */
 class Api
 {

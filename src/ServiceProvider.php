@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TheFrosty\WpX402;
+namespace WpX402\WpX402;
 
 use Dwnload\EddSoftwareLicenseManager\Edd\License;
 use Dwnload\WpSettingsApi\WpSettingsApi;
@@ -11,13 +11,13 @@ use Multicoin\AddressValidator\WalletAddressValidator;
 use Pimple\Container as PimpleContainer;
 use Pimple\ServiceProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
-use TheFrosty\WpX402\Settings\Factory;
+use WpX402\WpX402\Settings\Factory;
 use function apply_filters;
 use function is_array;
 
 /**
  * Class ServiceProvider
- * @package TheFrosty
+ * @package WpX402
  */
 class ServiceProvider implements ServiceProviderInterface
 {

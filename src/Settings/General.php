@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TheFrosty\WpX402\Settings;
+namespace WpX402\WpX402\Settings;
 
 use Dwnload\WpSettingsApi\Api\SettingField;
 use Dwnload\WpSettingsApi\Api\SettingSection;
@@ -11,16 +11,16 @@ use Dwnload\WpSettingsApi\Settings\FieldTypes;
 use Dwnload\WpSettingsApi\Settings\SectionManager;
 use Dwnload\WpSettingsApi\WpSettingsApi;
 use TheFrosty\WpUtilities\Plugin\AbstractContainerProvider;
-use TheFrosty\WpX402\Networks\Mainnet;
-use TheFrosty\WpX402\Networks\Testnet;
-use TheFrosty\WpX402\Paywall\PaywallInterface;
+use WpX402\WpX402\Networks\Mainnet;
+use WpX402\WpX402\Networks\Testnet;
+use WpX402\WpX402\Paywall\PaywallInterface;
 use function __;
 use function esc_html__;
 use function sprintf;
 
 /**
  * Class General
- * @package TheFrosty\WpLoginLocker\Settings
+ * @package WpX402\WpLoginLocker\Settings
  */
 class General extends AbstractContainerProvider
 {

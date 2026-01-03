@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace TheFrosty\WpX402\Settings;
+namespace WpX402\WpX402\Settings;
 
 use Dwnload\WpSettingsApi\Api\Options;
 use NumberFormatter;
-use TheFrosty\WpX402\Networks\Mainnet;
-use TheFrosty\WpX402\Paywall\PaywallInterface;
+use WpX402\WpX402\Networks\Mainnet;
+use WpX402\WpX402\Paywall\PaywallInterface;
 use function sprintf;
 
 /**
  * Class Setting
- * @package TheFrosty\WpX402\Settings
+ * @package WpX402\WpX402\Settings
  */
 class Setting
 {
