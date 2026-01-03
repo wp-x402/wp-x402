@@ -12,14 +12,8 @@ use Dwnload\WpSettingsApi\Settings\SectionManager;
 use Dwnload\WpSettingsApi\WpSettingsApi;
 use TheFrosty\WpUtilities\Plugin\AbstractContainerProvider;
 use WpX402\WpX402\Api\Bots;
-use WpX402\WpX402\Networks\Mainnet;
-use WpX402\WpX402\Networks\Testnet;
-use WpX402\WpX402\Paywall\PaywallInterface;
-use function __;
 use function array_keys;
 use function esc_html__;
-use function sprintf;
-use const JSON_PRETTY_PRINT;
 
 /**
  * Class Agents
