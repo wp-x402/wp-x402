@@ -49,6 +49,7 @@ $plugin
 
 if (is_admin()) {
     $plugin
+        ->add(new Settings\Agents($container))
         ->add(new Settings\Factory($container))
         ->add(new Settings\General($container));
 }
