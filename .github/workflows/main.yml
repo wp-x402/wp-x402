@@ -68,7 +68,7 @@ jobs:
         run: composer phpstan
         env:
           CHANGED_FILES: ${{ steps.ci-setup.outputs.files }}
-  
+
   run-phpunit:
     name: Run PHPUnit
     if: ${{ false }} # Disabled until tests are added.
