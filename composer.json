@@ -58,8 +58,10 @@
   },
   "scripts": {
     "phpcs": "bash ./vendor/thefrosty/wp-utilities/bin/phpcs.sh --standard=phpcs-ruleset.xml",
+    "phpcs:full": "vendor/bin/phpcs --standard=phpcs-ruleset.xml",
     "phpstan": "bash ./vendor/thefrosty/wp-utilities/bin/phpstan.sh",
-    "phpunit": "./vendor/bin/phpunit --colors",
+    "phpstan:full": "vendor/bin/phpstan analyze",
+    "phpunit": "./vendor/bin/phpunit --colors --no-coverage",
     "phpunit:coverage": "./vendor/bin/phpunit --colors --coverage-html ./tests/results && php ./tests/clover-results.php ./tests/clover.xml 10"
   }
 }
