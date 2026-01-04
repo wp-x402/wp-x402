@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WpX402\WpX402\Networks;
 
 use WebdevCave\EnumIndexAccessor\BackedEnumIndexAccessor;
+use function strtoupper;
 
 /**
  * Live, fully operational blockchain with real transactions and actual assets.
@@ -25,4 +26,14 @@ enum Mainnet: string implements Network
     case SOLANA = 'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp';
 
     case FACILITATOR = 'https://api.cdp.coinbase.com/platform/v2/x402';
+
+    public static function getAsset(string $asset): self
+    {
+        return self::{'ASSET_' . strtoupper($asset)};
+    }
+
+    public static function getBase(string $asset): self
+    {
+        return self::{strtoupper($asset)};
+    }
 }
