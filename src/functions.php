@@ -4,11 +4,26 @@ declare(strict_types=1);
 
 namespace WpX402\WpX402;
 
+use TheFrosty\WpUtilities\Utils\Anonymizer;
 use WpX402\WpX402\Api\Api;
 use WpX402\WpX402\Middleware\Middleware;
 use WpX402\WpX402\Middleware\Rejection;
 use WpX402\WpX402\Settings\Setting;
 use WpX402\WpX402\Telemetry\EventType;
+
+/**
+ * Returns the Anonymizer.
+ * @return object<Anonymizer>
+ */
+function anonymizer(): object
+{
+    static $instance;
+    $instance ??= new class {
+        use Anonymizer;
+    };
+
+    return $instance;
+}
 
 /**
  * Returns the Middleware.
@@ -42,14 +57,20 @@ function reject(string $code, string $message, int|null $status): Rejection
  */
 function telemetry(EventType $event_type, array $meta = []): void
 {
+    static $data;
+    if (!empty($data)) {
+        return;
+    }
+
     $data = [
         Api::ACTION => Api::ACTION_COLLECT,
+        'uuid' => anonymizer()->uuid(),
         'event_type' => $event_type->value,
         'project_type' => 'wordpress-plugin',
-        'wallet' => Setting::getWallet(),
+        'wallet' => anonymizer()->anonymize(Setting::getWallet()),
         'amount' => Setting::getPrice(),
         'meta' => $meta,
     ];
 
-    Api::wpRemote(Api::getApiUrl(Api::ACTION_COLLECT), $data);
+    Api::wpRemote(Api::getApiUrl(Api::ACTION_COLLECT), $data, ['timeout' => 2]);
 }
