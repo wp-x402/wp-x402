@@ -57,8 +57,7 @@ function reject(string $code, string $message, int|null $status): Rejection
  */
 function telemetry(EventType $event_type, array $meta = []): void
 {
-    static $data;
-    if (!empty($data)) {
+    if (!Setting::allowTelemetry()) {
         return;
     }
 
