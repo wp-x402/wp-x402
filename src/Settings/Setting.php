@@ -39,13 +39,21 @@ class Setting
     }
 
     /**
+     * Return the account setting.
+     * @return string
+     */
+    public static function getAccount(): string
+    {
+        return sanitize_text_field(self::getGeneralSetting(General::ACCOUNT, array_key_first(self::getAccounts())));
+    }
+
+    /**
      * Return the wallet setting.
      * @return string
      */
     public static function getWallet(): string
     {
-        $account = self::getGeneralSetting(General::ACCOUNT, array_key_first(self::getAccounts()));
-        return sanitize_text_field(self::getGeneralSetting(sprintf(General::WALLET, $account), ''));
+        return sanitize_text_field(self::getGeneralSetting(sprintf(General::WALLET, self::getAccount()), ''));
     }
 
     /**
