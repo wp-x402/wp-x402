@@ -51,7 +51,8 @@ if (is_admin()) {
     $plugin
         ->add(new Settings\Agents($container))
         ->add(new Settings\Factory($container))
-        ->add(new Settings\General($container));
+        ->add(new Settings\General($container))
+        ->add(new Settings\Misc($container));
 }
 
 add_action('init', static function () use ($plugin): void {

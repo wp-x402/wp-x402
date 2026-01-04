@@ -18,6 +18,15 @@ class Setting
 {
 
     /**
+     * Is telemetry allowed?
+     * @return bool
+     */
+    public static function allowTelemetry(): bool
+    {
+        return self::getMiscSetting(Misc::TELEMETRY, 'off') === 'on';
+    }
+
+    /**
      * Get allowed accounts.
      * @return array
      */
@@ -77,5 +86,16 @@ class Setting
     protected static function getGeneralSetting(string $key, mixed $default = null): mixed
     {
         return Options::getOption($key, General::SECTION_ID, $default);
+    }
+
+    /**
+     * Get our option key in our misc setting index.
+     * @param string $key
+     * @param mixed|null $default
+     * @return mixed
+     */
+    protected static function getMiscSetting(string $key, mixed $default = null): mixed
+    {
+        return Options::getOption($key, Misc::SECTION_ID, $default);
     }
 }
