@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WpX402\WpX402\Networks;
 
 use WebdevCave\EnumIndexAccessor\BackedEnumIndexAccessor;
+use function strtoupper;
 
 /**
  * Sandbox environments for testing smart contracts, dapps, and other blockchain functionality without risking real
@@ -26,4 +27,14 @@ enum Testnet: string implements Network
     case SOLANA = 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1';
 
     case FACILITATOR = 'https://x402.org/facilitator';
+
+    public static function getAsset(string $asset): self
+    {
+        return self::{'ASSET_' . strtoupper($asset)};
+    }
+
+    public static function getBase(string $asset): self
+    {
+        return self::{strtoupper($asset)};
+    }
 }
