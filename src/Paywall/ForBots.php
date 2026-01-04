@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace WpX402\WpX402\Paywall;
 
+use Dwnload\EddSoftwareLicenseManager\Edd\License;
 use WP_Http;
 use WpX402\WpX402\Api\Api;
 use WpX402\WpX402\Api\Bots;
@@ -34,6 +35,7 @@ use function wp_remote_retrieve_body;
 use function wp_remote_retrieve_response_code;
 use function WpX402\WpX402\telemetry;
 use const JSON_THROW_ON_ERROR;
+use const WpX402\WpX402\PLUGIN_SLUG;
 
 /**
  * Class ForBots
@@ -62,6 +64,11 @@ class ForBots extends AbstractPaywall
             return;
         }
 
+        // 1. Validate the license.
+        if (!License::isActiveValid(PLUGIN_SLUG) || License::isExpired(PLUGIN_SLUG)) {
+            return;
+        }
+
         $user_agent = $this->getRequest()?->server->get('HTTP_USER_AGENT', '');
         $is_fake_bot = $this->getRequest()?->query->has('fakeBot');
 
@@ -82,7 +89,7 @@ class ForBots extends AbstractPaywall
             return;
         }
 
-        // 2. Validate the wallet once more.
+        // 2. Validate the wallet.
         $wallet = Setting::getWallet();
         $validator = $this->getContainer()?->get(ServiceProvider::WALLET_ADDRESS_VALIDATOR);
         if (!Api::isValidWallet($validator, $wallet)) {
