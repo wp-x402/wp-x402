@@ -90,6 +90,7 @@ class ForBots extends AbstractPaywall
         }
 
         // 2. Validate the wallet.
+        $account = Setting::getAccount();
         $wallet = Setting::getWallet();
         $validator = $this->getContainer()?->get(ServiceProvider::WALLET_ADDRESS_VALIDATOR);
         if (!Api::isValidWallet($validator, $wallet)) {
@@ -109,9 +110,13 @@ class ForBots extends AbstractPaywall
             PaymentRequired::ACCEPTS => [
                 [
                     Accepts::SCHEME => 'exact',
-                    Accepts::NETWORK => $is_mainnet ? Mainnet::BASE->value : Testnet::BASE->value,
+                    Accepts::NETWORK => $is_mainnet ?
+                        Mainnet::getBase($account)->value :
+                        Testnet::getBase($account)->value,
                     Accepts::AMOUNT => Setting::getPrice(),
-                    Accepts::ASSET => $is_mainnet ? Mainnet::ASSET_BASE->value : Testnet::ASSET_BASE->value,
+                    Accepts::ASSET => $is_mainnet ?
+                        Mainnet::getAsset($account)->value :
+                        Testnet::getAsset($account)->value,
                     Accepts::PAY_TO => $wallet,
                     Accepts::MAX_TIMEOUT_SECONDS => 60,
                     Accepts::EXTRA => [
@@ -142,7 +147,9 @@ class ForBots extends AbstractPaywall
             telemetry(
                 EventType::REQUIRED,
                 [
-                    Accepts::NETWORK => $is_mainnet ? Mainnet::BASE->value : Testnet::BASE->value,
+                    Accepts::NETWORK => $is_mainnet ?
+                        Mainnet::getBase($account)->value :
+                        Testnet::getBase($account)->value,
                     UrlResource::URL => $payment_required->getResource()->getUrl(),
                 ]
             );

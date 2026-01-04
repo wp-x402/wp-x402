@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace WpX402\WpX402\Paywall;
 
+use Dwnload\EddSoftwareLicenseManager\Edd\License;
 use WpX402\WpX402\Api\Api;
 use WpX402\WpX402\Models\PaymentRequired;
 use WpX402\WpX402\Models\PaymentRequired\Accepts;
@@ -14,6 +15,7 @@ use WpX402\WpX402\ServiceProvider;
 use WpX402\WpX402\Settings\Setting;
 use function esc_html__;
 use function get_permalink;
+use const WpX402\WpX402\PLUGIN_SLUG;
 
 /**
  * Class ForHumans
@@ -39,9 +41,18 @@ class ForHumans extends AbstractPaywall
      */
     protected function theContent(string $content): string
     {
+        // 1. Validate the license.
+        if (!License::isActiveValid(PLUGIN_SLUG) || License::isExpired(PLUGIN_SLUG)) {
+            $prefix = '<!-- x402 Error: This content can\'t be restricted. -->';
+            return $prefix . $content;
+        }
+
+        // 2. Validate the wallet.
+        $account = Setting::getAccount();
         $wallet = Setting::getWallet();
         $validator = $this->getContainer()?->get(ServiceProvider::WALLET_ADDRESS_VALIDATOR);
         if (!Api::isValidWallet($validator, $wallet)) {
+            $prefix = '<!-- x402 Error: This content can\'t be restricted. -->';
             return $content; // @TODO we should look into doing something if a wallet is invalid
         }
 
@@ -57,9 +68,13 @@ class ForHumans extends AbstractPaywall
             PaymentRequired::ACCEPTS => [
                 [
                     Accepts::SCHEME => 'exact',
-                    Accepts::NETWORK => $is_mainnet ? Mainnet::BASE->value : Testnet::BASE->value,
+                    Accepts::NETWORK => $is_mainnet ?
+                        Mainnet::getBase($account)->value :
+                        Testnet::getBase($account)->value,
                     Accepts::AMOUNT => Setting::getPrice(),
-                    Accepts::ASSET => $is_mainnet ? Mainnet::ASSET_BASE->value : Testnet::ASSET_BASE->value,
+                    Accepts::ASSET => $is_mainnet ?
+                        Mainnet::getAsset($account)->value :
+                        Testnet::getAsset($account)->value,
                     Accepts::PAY_TO => $wallet,
                     Accepts::MAX_TIMEOUT_SECONDS => 60,
                     Accepts::EXTRA => [
