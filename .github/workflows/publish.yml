@@ -31,12 +31,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      # see https://github.com/shivammathur/setup-php
       - name: Use PHP 8.3
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.3
           coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+
+      - name: Run npm install
+        run: |
+          npm install --omit=dev
+          npm prune --production
 
       - name: Build project for production
         run: |
