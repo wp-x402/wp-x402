@@ -101,7 +101,10 @@ class ForBots extends AbstractPaywall
         $is_mainnet = Setting::isMainnet();
 
         $payment_required = new PaymentRequired([
-            PaymentRequired::ERROR => esc_html__('PAYMENT-SIGNATURE header is required', 'wp-x402'),
+            PaymentRequired::ERROR => sprintf(
+                esc_html__('%s header is required', 'wp-x402'),
+                Api::HEADER_PAYMENT_SIGNATURE
+            ),
             PaymentRequired::RESOURCE => [
                 UrlResource::URL => get_permalink(),
                 UrlResource::DESCRIPTION => Entitlement::PAYMENT_REQUIRED->label(),
