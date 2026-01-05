@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WpX402\WpX402\Models\PaymentRequired;
 
 use TheFrosty\WpUtilities\Models\BaseModel;
+use WpX402\WpX402\Schema\Payment;
 
 /**
  * Class Accepts
@@ -21,16 +22,16 @@ class Accepts extends BaseModel
     public const string MAX_TIMEOUT_SECONDS = 'maxTimeoutSeconds';
     public const string EXTRA = 'extra';
 
-    protected string $scheme = 'exact';
+    protected Payment|string|null $scheme = 'exact';
 
     public function getScheme(): string
     {
-        return $this->scheme;
+        return $this->scheme instanceof Payment ? $this->scheme->value : ($this->scheme ?? 'exact');
     }
 
-    public function setScheme(string $scheme = 'exact'): void
+    public function setScheme(Payment|string $scheme = 'exact'): void
     {
-        $this->scheme = $scheme;
+        $this->scheme = $scheme instanceof Payment ? $scheme : Payment::tryFrom($scheme)->value;
     }
 
     protected string $network;

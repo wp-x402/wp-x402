@@ -13,6 +13,7 @@ use WpX402\WpX402\Models\PaymentRequired\Accepts;
 use WpX402\WpX402\Models\PaymentRequired\UrlResource;
 use WpX402\WpX402\Networks\Mainnet;
 use WpX402\WpX402\Networks\Testnet;
+use WpX402\WpX402\Schema\Payment;
 use WpX402\WpX402\ServiceProvider;
 use WpX402\WpX402\Settings\Setting;
 use WpX402\WpX402\Telemetry\EventType;
@@ -108,7 +109,7 @@ class ForBots extends AbstractPaywall
             ],
             PaymentRequired::ACCEPTS => [
                 [
-                    Accepts::SCHEME => 'exact',
+                    Accepts::SCHEME => Payment::from('exact')->value,
                     Accepts::NETWORK => $is_mainnet ?
                         Mainnet::getBase($account)->value :
                         Testnet::getBase($account)->value,
