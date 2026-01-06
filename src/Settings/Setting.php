@@ -7,6 +7,7 @@ namespace WpX402\WpX402\Settings;
 use Dwnload\WpSettingsApi\Api\Options;
 use NumberFormatter;
 use WpX402\WpX402\Networks\Mainnet;
+use WpX402\WpX402\Networks\Testnet;
 use WpX402\WpX402\Paywall\PaywallInterface;
 use function sprintf;
 
@@ -62,7 +63,7 @@ class Setting
      */
     public static function getNetwork(): string
     {
-        return sanitize_text_field(self::getGeneralSetting(General::NETWORK, 'testnet'));
+        return sanitize_text_field(self::getGeneralSetting(General::NETWORK, Testnet::class));
     }
 
     /**
