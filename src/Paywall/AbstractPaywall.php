@@ -31,6 +31,7 @@ abstract class AbstractPaywall extends AbstractContainerProvider implements
      */
     protected function getPaymentSignature(): ?string
     {
+        // Headers: x402 v1 API => X-PAYMENT, x402 v2 API: X-PAYMENT-SIGNATURE.
         $headers = [Api::HEADER_X_PAYMENT, Api::HEADER_PAYMENT_SIGNATURE];
         foreach ($headers as $header) {
             if ($this->getRequest()?->headers->has($header)) {

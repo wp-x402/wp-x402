@@ -117,6 +117,9 @@ class General extends AbstractContainerProvider
                     SettingField::LABEL => sprintf('%s %s', $label, esc_html__('Wallet', 'wp-x402')),
                     SettingField::DESC => esc_html__('Merchant Wallet Address.', 'wp-x402'),
                     SettingField::DEFAULT => '',
+                    SettingField::ATTRIBUTES => [
+                        'style' => 'field-sizing: content',
+                    ],
                     SettingField::TYPE => FieldTypes::FIELD_TYPE_TEXT,
                     SettingField::SANITIZE => function (mixed $value, array $settings, string $key): string {
                         return $this->validateWallet($value, $settings, $key);
