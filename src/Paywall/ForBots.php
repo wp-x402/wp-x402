@@ -34,6 +34,7 @@ use function strip_tags;
 use function TheFrosty\WpUtilities\exitOrThrow;
 use function wp_remote_retrieve_body;
 use function wp_remote_retrieve_response_code;
+use function WpX402\WpX402\setHeader;
 use function WpX402\WpX402\telemetry;
 use const JSON_THROW_ON_ERROR;
 use const WpX402\WpX402\PLUGIN_SLUG;
@@ -67,6 +68,7 @@ class ForBots extends AbstractPaywall
 
         // 1. Validate the license.
         if (!License::isActiveValid(PLUGIN_SLUG) || License::isExpired(PLUGIN_SLUG)) {
+            setHeader(__('Invalid or Expired License', 'wp-x402'));
             return;
         }
 
@@ -95,6 +97,7 @@ class ForBots extends AbstractPaywall
         $wallet = Setting::getWallet();
         $validator = $this->getContainer()?->get(ServiceProvider::WALLET_ADDRESS_VALIDATOR);
         if (!Api::isValidWallet($validator, $wallet)) {
+            setHeader(__('Invalid Wallet', 'wp-x402'));
             return; // @TODO we should look into doing something if a wallet is invalid
         }
 
@@ -102,7 +105,7 @@ class ForBots extends AbstractPaywall
 
         $payment_required = new PaymentRequired([
             PaymentRequired::ERROR => sprintf(
-                esc_html__('%s header is required', 'wp-x402'),
+                esc_html__('`%s` header is required', 'wp-x402'),
                 Api::HEADER_PAYMENT_SIGNATURE
             ),
             PaymentRequired::RESOURCE => [
@@ -164,6 +167,7 @@ class ForBots extends AbstractPaywall
             Api::getApiUrl(Api::ACTION_VERIFY),
             [
                 Api::ACTION => Api::ACTION_VERIFY,
+                Api::NETWORK => Setting::getNetwork(),
                 Api::PAYMENT_REQUIREMENTS => base64_encode(
                     json_encode($payment_required->toArray(), JSON_THROW_ON_ERROR)
                 ),
