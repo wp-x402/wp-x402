@@ -10,6 +10,9 @@ use WpX402\WpX402\Middleware\Middleware;
 use WpX402\WpX402\Middleware\Rejection;
 use WpX402\WpX402\Settings\Setting;
 use WpX402\WpX402\Telemetry\EventType;
+use function header;
+use function headers_sent;
+use function sprintf;
 
 /**
  * Returns the Anonymizer.
@@ -47,6 +50,17 @@ function middleware(): Middleware
 function reject(string $code, string $message, int|null $status): Rejection
 {
     return new Rejection([Rejection::CODE => $code, Rejection::MESSAGE => $message, Rejection::STATUS => $status]);
+}
+
+/**
+ * Set an HTTP header message with the `X-402` key.
+ * @param string $message
+ */
+function setHeader(string $message): void
+{
+    if (!headers_sent()) {
+        header(sprintf('%s: %s', Api::HEADER_X_402, $message));
+    }
 }
 
 /**

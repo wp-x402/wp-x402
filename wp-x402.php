@@ -43,7 +43,6 @@ $plugin
     ->add(new DisablePluginUpdateCheck())
     ->add(new Edd\LicenseManager($plugin, $container->get(ServiceProvider::LICENSE_DATA)))
     ->add(new Paywall\ForBots($container))
-    ->add(new Paywall\ForHumans($container))
     ->addOnHook(Middleware\Middleware::class, 'rest_api_init');
 
 if (is_admin()) {
