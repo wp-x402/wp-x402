@@ -95,7 +95,6 @@ class PaymentRequired extends BaseModel
     {
         return [
             self::VERSION,
-            self::ERROR,
             self::RESOURCE,
             self::ACCEPTS,
             self::PAYLOAD,
