@@ -118,7 +118,7 @@ class General extends AbstractContainerProvider
                     SettingField::DESC => esc_html__('Merchant Wallet Address.', 'wp-x402'),
                     SettingField::DEFAULT => '',
                     SettingField::ATTRIBUTES => [
-                        'style' => 'field-sizing: content'
+                        'style' => 'field-sizing: content',
                     ],
                     SettingField::TYPE => FieldTypes::FIELD_TYPE_TEXT,
                     SettingField::SANITIZE => function (mixed $value, array $settings, string $key): string {
