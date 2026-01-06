@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WpX402\WpX402\Paywall;
 
 use Dwnload\EddSoftwareLicenseManager\Edd\License;
+use ReflectionClass;
 use WP_Http;
 use WpX402\WpX402\Api\Api;
 use WpX402\WpX402\Api\Bots;
@@ -31,6 +32,7 @@ use function json_encode;
 use function sprintf;
 use function status_header;
 use function strip_tags;
+use function strtolower;
 use function TheFrosty\WpUtilities\exitOrThrow;
 use function wp_remote_retrieve_body;
 use function wp_remote_retrieve_response_code;
@@ -167,7 +169,7 @@ class ForBots extends AbstractPaywall
             Api::getApiUrl(Api::ACTION_VERIFY),
             [
                 Api::ACTION => Api::ACTION_VERIFY,
-                Api::NETWORK => Setting::getNetwork(),
+                Api::NETWORK => strtolower((new ReflectionClass(Setting::getNetwork()))->getShortName()),
                 Api::PAYMENT_REQUIREMENTS => base64_encode(
                     json_encode($payment_required->toArray(), JSON_THROW_ON_ERROR)
                 ),
