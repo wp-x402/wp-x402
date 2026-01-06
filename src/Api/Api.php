@@ -27,10 +27,12 @@ class Api
     public const string ACTION = 'wp_x402';
     public const string ACTION_COLLECT = 'collect';
     public const string ACTION_VERIFY = 'verify';
+    public const string HEADER_X_402 = 'X-402';
     public const string HEADER_PAYMENT_RESPONSE = 'PAYMENT-RESPONSE';
     public const string HEADER_PAYMENT_REQUIRED = 'PAYMENT-REQUIRED';
     public const string HEADER_PAYMENT_SIGNATURE = 'PAYMENT-SIGNATURE';
     public const string HEADER_X_PAYMENT = 'X-PAYMENT';
+    public const string NETWORK = 'network';
     public const string PAYMENT_REQUIREMENTS = 'paymentRequirements';
     public const string PAYMENT_SIGNATURE = 'paymentSignature';
     final public const string URL = 'https://api.wp-x402.com';
