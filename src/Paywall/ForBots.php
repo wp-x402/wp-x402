@@ -101,7 +101,7 @@ class ForBots extends AbstractPaywall
 
         // 2. Validate paywall enabled for object or category.
         if (
-            !Paywall::isPaywallEnabled(get_the_ID()) ||
+            !Paywall::isPaywallEnabled(get_the_ID()) &&
             Paywall::areCategoriesExcludedFromPaywall(get_the_category(get_the_ID()))
         ) {
             setHeader(__('Notice: Paywall Disabled for Object or Excluded by Category', 'wp-x402'));
