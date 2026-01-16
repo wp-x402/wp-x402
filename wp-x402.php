@@ -42,6 +42,8 @@ $container->register(new ServiceProvider());
 $plugin
     ->add(new DisablePluginUpdateCheck())
     ->add(new Edd\LicenseManager($plugin, $container->get(ServiceProvider::LICENSE_DATA)))
+    ->add(new Paywall\Meta\Category($container))
+    ->add(new Paywall\Meta\Post($container))
     ->add(new Paywall\ForBots($container))
     ->addOnHook(Middleware\Middleware::class, 'rest_api_init');
 

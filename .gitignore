@@ -1,5 +1,6 @@
 .DS_Store
 /.idea
+/assets/vendor
 tests/results/
 node_modules/
 tests/.phpunit.cache

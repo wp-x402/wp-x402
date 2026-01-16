@@ -23,7 +23,9 @@ use function base64_encode;
 use function esc_html__;
 use function get_permalink;
 use function get_post;
+use function get_the_category;
 use function get_the_date;
+use function get_the_ID;
 use function get_the_title;
 use function is_attachment;
 use function is_singular;
@@ -103,6 +105,15 @@ class ForBots extends AbstractPaywall
             return; // @TODO we should look into doing something if a wallet is invalid
         }
 
+        // 3. Validate paywall enabled for object or category.
+        if (
+            !Paywall::isPaywallEnabled(get_the_ID()) ||
+            Paywall::areCategoriesExcludedFromPaywall(get_the_category(get_the_ID()))
+        ) {
+            setHeader(__('Paywall Disabled for Object or Excluded by Category', 'wp-x402'));
+            return;
+        }
+
         $is_mainnet = Setting::isMainnet();
 
         $payment_required = new PaymentRequired([
@@ -135,7 +146,7 @@ class ForBots extends AbstractPaywall
             ],
         ]);
 
-        // 3. Check for Payment Header.
+        // 4. Check for Payment Header.
         $paymentSignature = $this->getPaymentSignature();
 
         // Scenario A: No Payment Hash -> Return 402 Offer.
