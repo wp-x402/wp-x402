@@ -45,6 +45,7 @@ $plugin
     ->add(new Paywall\Meta\Category($container))
     ->add(new Paywall\Meta\Post($container))
     ->add(new Paywall\ForBots($container))
+    ->add(new Paywall\ForHumans($container))
     ->addOnHook(Middleware\Middleware::class, 'rest_api_init');
 
 if (is_admin()) {
