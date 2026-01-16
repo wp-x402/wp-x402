@@ -13,7 +13,7 @@ use const FILTER_VALIDATE_BOOL;
 
 /**
  * Class Paywall
- * @package CrainsGrandRapids\Meta
+ * @package WpX402\WpX402\Paywall
  */
 class Paywall
 {
@@ -23,7 +23,7 @@ class Paywall
      * @param WP_Term[] $categories
      * @return bool
      */
-    public static function arePostCategoriesExcludedFromPaywall(array $categories): bool
+    public static function areCategoriesExcludedFromPaywall(array $categories): bool
     {
         foreach ($categories as $category) {
             if (self::isCategoryExcludedFromPaywall($category->term_id)) {
@@ -40,7 +40,7 @@ class Paywall
      */
     public static function isCategoryExcludedFromPaywall(int $term_id): bool
     {
-        return filter_var(carbon_get_term_meta($term_id, Category::NAME), FILTER_VALIDATE_BOOL);
+        return (bool)filter_var(carbon_get_term_meta($term_id, Category::NAME), FILTER_VALIDATE_BOOL);
     }
 
     /**
@@ -65,9 +65,6 @@ class Paywall
     private static function isPaywallEnabledForObject(int $post_id): bool
     {
         $paywall_enabled = carbon_get_post_meta($post_id, PaywallInterface::PAYWALL_ENABLED);
-        if (empty($paywall_enabled) && $paywall_enabled !== '0') {
-            return true;
-        }
-        return filter_var($paywall_enabled, FILTER_VALIDATE_BOOL);
+        return (bool)filter_var($paywall_enabled, FILTER_VALIDATE_BOOL);
     }
 }
