@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace WpX402\WpX402\Paywall;
 
+use WP_Term;
+use WpX402\WpX402\Paywall\Meta\Category;
+use function carbon_get_post_meta;
+use function carbon_get_term_meta;
 use function filter_var;
-use function get_post_meta;
 use const FILTER_VALIDATE_BOOL;
 
 /**
@@ -14,6 +17,31 @@ use const FILTER_VALIDATE_BOOL;
  */
 class Paywall
 {
+
+    /**
+     * Check all given post categories for paywall exclusion metadata.
+     * @param WP_Term[] $categories
+     * @return bool
+     */
+    public static function arePostCategoriesExcludedFromPaywall(array $categories): bool
+    {
+        foreach ($categories as $category) {
+            if (self::isCategoryExcludedFromPaywall($category->term_id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check category for paywall exclusion metadata.
+     * @param int $term_id
+     * @return bool
+     */
+    public static function isCategoryExcludedFromPaywall(int $term_id): bool
+    {
+        return filter_var(carbon_get_term_meta($term_id, Category::NAME), FILTER_VALIDATE_BOOL);
+    }
 
     /**
      * Check if paywall is enabled for given post.
@@ -36,7 +64,7 @@ class Paywall
      */
     private static function isPaywallEnabledForObject(int $post_id): bool
     {
-        $paywall_enabled = get_post_meta($post_id, PaywallInterface::PAYWALL_ENABLED, true);
+        $paywall_enabled = carbon_get_post_meta($post_id, PaywallInterface::PAYWALL_ENABLED);
         if (empty($paywall_enabled) && $paywall_enabled !== '0') {
             return true;
         }
