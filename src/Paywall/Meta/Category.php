@@ -65,12 +65,12 @@ class Category extends CarbonFields
             $content = sprintf(
                 '<span class="dashicons dashicons-money-alt x402-green" 
 title="%s"></span>',
-                esc_attr__('Not excluded from paywall', 'wp-x402')
+                esc_attr__('Not excluded from x402 Paywall', 'wp-x402')
             );
             if (Paywall::isCategoryExcludedFromPaywall($term_id)) {
                 $content = sprintf(
                     '<span class="dashicons dashicons-yes-alt x402-red" title="%s"></span>',
-                    esc_attr__('Excluded from paywall', 'wp-x402')
+                    esc_attr__('Excluded from x402 Paywall', 'wp-x402')
                 );
             }
         }
