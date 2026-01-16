@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace WpX402\WpX402\Paywall\Meta;
 
-use Carbon_Fields\Exception\Incorrect_Syntax_Exception;
-use Carbon_Fields\Field\Field;
 use WpX402\WpX402\Integration\CarbonFields\CarbonFields;
 use WpX402\WpX402\Paywall\Paywall;
 use function esc_attr__;
@@ -32,7 +30,8 @@ class Category extends CarbonFields
     }
 
     /**
-     * @throws Incorrect_Syntax_Exception
+     * Register our Category fields.
+     * @throws \Carbon_Fields\Exception\Incorrect_Syntax_Exception
      */
     protected function registerFields(): void
     {
@@ -141,7 +140,7 @@ title="%s"></span>',
 
     /**
      * Get our fields array.
-     * @return Field[]
+     * @return \Carbon_Fields\Field\Field[]
      */
     private function getFields(): array
     {

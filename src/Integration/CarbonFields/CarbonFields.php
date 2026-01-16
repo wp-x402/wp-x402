@@ -42,6 +42,9 @@ abstract class CarbonFields extends AbstractContainerProvider implements FieldsI
     }
 
     /**
+     * Return a cast container.
+     * @param string $label
+     * @return Post_Meta_Container
      * @throws Incorrect_Syntax_Exception
      */
     public function postMetaContainer(string $label): Post_Meta_Container
@@ -55,6 +58,9 @@ abstract class CarbonFields extends AbstractContainerProvider implements FieldsI
     }
 
     /**
+     * Return a cast container.
+     * @param string $label
+     * @return Term_Meta_Container
      * @throws Incorrect_Syntax_Exception
      */
     public function termMetaContainer(string $label): Term_Meta_Container
@@ -88,9 +94,11 @@ abstract class CarbonFields extends AbstractContainerProvider implements FieldsI
             'carbon-sidebar-manager',
             'crbSidebarl10n',
             [
+                // phpcs:disable WordPress.WP.I18n.TextDomainMismatch
                 'add_sidebar' => __('Add Sidebar', 'carbon-fields'),
                 'enter_name_of_new_sidebar' => __('Please enter the name of the new sidebar:', 'carbon-fields'),
                 'remove_sidebar_confirmation' => __('Are you sure you wish to remove this sidebar?', 'carbon-fields'),
+                // phpcs:enable
             ]
         );
     }

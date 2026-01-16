@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace WpX402\WpX402\Paywall;
 
-use WP_Term;
 use WpX402\WpX402\Paywall\Meta\Category;
 use function carbon_get_post_meta;
 use function carbon_get_term_meta;
@@ -20,7 +19,7 @@ class Paywall
 
     /**
      * Check all given post categories for paywall exclusion metadata.
-     * @param WP_Term[] $categories
+     * @param \WP_Term[] $categories
      * @return bool
      */
     public static function areCategoriesExcludedFromPaywall(array $categories): bool

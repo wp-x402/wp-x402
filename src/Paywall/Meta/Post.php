@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace WpX402\WpX402\Paywall\Meta;
 
-use Carbon_Fields\Exception\Incorrect_Syntax_Exception;
-use Carbon_Fields\Field\Field;
 use WpX402\WpX402\Integration\CarbonFields\CarbonFields;
 use WpX402\WpX402\Paywall\PaywallInterface;
 use function esc_html;
@@ -18,7 +16,8 @@ class Post extends CarbonFields
 {
 
     /**
-     * @throws Incorrect_Syntax_Exception
+     * Register our Post fields.
+     * @throws \Carbon_Fields\Exception\Incorrect_Syntax_Exception
      */
     protected function registerFields(): void
     {
@@ -31,7 +30,7 @@ class Post extends CarbonFields
 
     /**
      * Get our fields array.
-     * @return Field[]
+     * @return \Carbon_Fields\Field\Field[]
      */
     private function getFields(): array
     {
