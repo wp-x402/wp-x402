@@ -146,7 +146,10 @@ title="%s"></span>',
     private function getFields(): array
     {
         return [
-            $this->createCheckboxField(self::NAME, esc_html__('Remove Paywall from Category', 'wp-x402')),
+            $this->createCheckboxField(
+                self::NAME,
+                esc_html__('Remove Paywall from Category', 'wp-x402')
+            )->set_option_value('yes')->set_default_value('')->set_visible_in_rest_api(),
         ];
     }
 }

@@ -36,7 +36,10 @@ class Post extends CarbonFields
     private function getFields(): array
     {
         return [
-            $this->createCheckboxField(PaywallInterface::PAYWALL_ENABLED, esc_html__('Enable Paywall', 'wp-x402')),
+            $this->createCheckboxField(
+                PaywallInterface::PAYWALL_ENABLED,
+                esc_html__('Enable Paywall', 'wp-x402')
+            )->set_option_value('yes')->set_default_value('yes')->set_visible_in_rest_api(),
         ];
     }
 }
