@@ -6,7 +6,7 @@ namespace WpX402\WpX402\Integration\CarbonFields;
 
 /**
  * Interface TypeInterface
- * @package WpX402\WpX402\Integration
+ * @package WpX402\WpX402\Integration\CarbonFields
  */
 interface FieldsInterface
 {
