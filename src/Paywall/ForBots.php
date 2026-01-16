@@ -70,12 +70,6 @@ class ForBots extends AbstractPaywall
             return;
         }
 
-        // 1. Validate the license.
-        if (!License::isActiveValid(PLUGIN_SLUG) || License::isExpired(PLUGIN_SLUG)) {
-            setHeader(__('Invalid or Expired License', 'wp-x402'));
-            return;
-        }
-
         $user_agent = $this->getRequest()?->server->get('HTTP_USER_AGENT', '');
         $is_fake_bot = $this->getRequest()?->query->has('fakeBot');
 
@@ -96,21 +90,27 @@ class ForBots extends AbstractPaywall
             return;
         }
 
-        // 2. Validate the wallet.
+        // 1. Validate the wallet.
         $account = Setting::getAccount();
         $wallet = Setting::getWallet();
         $validator = $this->getContainer()?->get(ServiceProvider::WALLET_ADDRESS_VALIDATOR);
         if (!Api::isValidWallet($validator, $wallet)) {
-            setHeader(__('Invalid Wallet', 'wp-x402'));
+            setHeader(__('Error: Invalid Wallet Address', 'wp-x402'));
             return; // @TODO we should look into doing something if a wallet is invalid
         }
 
-        // 3. Validate paywall enabled for object or category.
+        // 2. Validate paywall enabled for object or category.
         if (
-            !Paywall::isPaywallEnabled(get_the_ID()) ||
+            !Paywall::isPaywallEnabled(get_the_ID()) &&
             Paywall::areCategoriesExcludedFromPaywall(get_the_category(get_the_ID()))
         ) {
-            setHeader(__('Paywall Disabled for Object or Excluded by Category', 'wp-x402'));
+            setHeader(__('Notice: Paywall Disabled for Object or Excluded by Category', 'wp-x402'));
+            return;
+        }
+
+        // 3. Validate the license.
+        if (!License::isActiveValid(PLUGIN_SLUG) || License::isExpired(PLUGIN_SLUG)) {
+            setHeader(__('Error: Invalid or Expired License', 'wp-x402'));
             return;
         }
 

@@ -42,19 +42,28 @@ class ForHumans extends AbstractPaywall
      */
     protected function theContent(string $content): string
     {
-        // 1. Validate the license.
-        if (!License::isActiveValid(PLUGIN_SLUG) || License::isExpired(PLUGIN_SLUG)) {
-            $prefix = '<!-- x402 Error: This content can\'t be restricted. -->';
-            return $prefix . $content;
-        }
-
-        // 2. Validate the wallet.
+        // 1. Validate the wallet.
         $account = Setting::getAccount();
         $wallet = Setting::getWallet();
         $validator = $this->getContainer()?->get(ServiceProvider::WALLET_ADDRESS_VALIDATOR);
         if (!Api::isValidWallet($validator, $wallet)) {
-            $prefix = '<!-- x402 Error: This content can\'t be restricted. -->';
-            return $content; // @TODO we should look into doing something if a wallet is invalid
+            $prefix = '<!-- x402 Error: Invalid Wallet Address. -->';
+            return $prefix . $content; // @TODO we should look into doing something if a wallet is invalid
+        }
+
+        // 2. Validate paywall enabled for object or category.
+        if (
+            !Paywall::isPaywallEnabled(get_the_ID()) &&
+            Paywall::areCategoriesExcludedFromPaywall(get_the_category(get_the_ID()))
+        ) {
+            $prefix = '<!-- x402 Notice: Paywall Disabled for Object or Excluded by Category. -->';
+            return $prefix . $content;
+        }
+
+        // 3. Validate the license.
+        if (!License::isActiveValid(PLUGIN_SLUG) || License::isExpired(PLUGIN_SLUG)) {
+            $prefix = '<!-- x402 Error: Invalid or Expired License. -->';
+            return $prefix . $content;
         }
 
         $is_mainnet = Setting::isMainnet();
