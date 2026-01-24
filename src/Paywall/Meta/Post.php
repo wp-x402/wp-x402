@@ -40,7 +40,8 @@ class Post extends CarbonFields
         if ($post_type === 'post') {
             $options[$this->getName(PaywallInterface::PAYWALL_ENABLED)] = [
                 new OptionValueLabel(
-                    $this->getName(PaywallInterface::PAYWALL_ENABLED), esc_html__('Paywall', 'wp-x402')
+                    $this->getName(PaywallInterface::PAYWALL_ENABLED),
+                    esc_html__('Paywall', 'wp-x402')
                 ),
             ];
         }
