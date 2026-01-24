@@ -24,6 +24,7 @@ use Exception;
 use ReflectionClass;
 use TheFrosty\WpUtilities\Plugin\PluginFactory;
 use TheFrosty\WpUtilities\WpAdmin\DisablePluginUpdateCheck;
+use TheFrosty\WpUtilities\WpAdmin\RestrictManagePosts;
 use WpX402\WpX402\Settings\Factory;
 use function defined;
 use function is_readable;
@@ -53,7 +54,8 @@ if (is_admin()) {
         ->add(new Settings\Agents($container))
         ->add(new Settings\Factory($container))
         ->add(new Settings\General($container))
-        ->add(new Settings\Misc($container));
+        ->add(new Settings\Misc($container))
+        ->addOnHook(RestrictManagePosts::class, 'load-edit.php');
 }
 
 add_action('init', static function () use ($plugin): void {

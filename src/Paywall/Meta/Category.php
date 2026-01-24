@@ -37,7 +37,7 @@ class Category extends CarbonFields
     {
         $this->termMetaContainer(esc_html('x402 Paywall Settings'))
             ->where('term_taxonomy', '=', 'category')
-            ->add_fields($this->getFields());
+            ->add_fields($this->addFields());
     }
 
     /**
@@ -142,7 +142,7 @@ title="%s"></span>',
      * Get our fields array.
      * @return \Carbon_Fields\Field\Field[]
      */
-    private function getFields(): array
+    private function addFields(): array
     {
         return [
             $this->createCheckboxField(
