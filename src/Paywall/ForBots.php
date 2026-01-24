@@ -110,6 +110,7 @@ class ForBots extends AbstractPaywall
 
         // 3. Validate the license.
         if (!License::isActiveValid(PLUGIN_SLUG) || License::isExpired(PLUGIN_SLUG)) {
+            // @TODO: Add logging or temp transient storage for admin notice.
             setHeader(__('Error: Invalid or Expired License', 'wp-x402'));
             return;
         }
