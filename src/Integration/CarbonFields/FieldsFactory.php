@@ -14,6 +14,18 @@ use Carbon_Fields\Field\Field;
 trait FieldsFactory
 {
 
+    /** @var array Field[] */
+    protected static array $fields = [];
+
+    public function getName(string $name): string
+    {
+        if (isset(self::$fields[$name]) && self::$fields[$name] instanceof Field) {
+            return self::$fields[$name]->get_name();
+        }
+
+        return $name;
+    }
+
     /**
      * Create a checkbox field.
      * @param string $name
@@ -22,6 +34,8 @@ trait FieldsFactory
      */
     protected function createCheckboxField(string $name, string $label): Field
     {
-        return Checkbox_Field::factory(FieldsInterface::CHECKBOX, $name, $label);
+        $field = Checkbox_Field::factory(FieldsInterface::CHECKBOX, $name, $label);
+        self::$fields[$name] = $field;
+        return $field;
     }
 }
