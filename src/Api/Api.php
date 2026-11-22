@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace WpX402\WpX402\Api;
 
+use Dwnload\EddSoftwareLicenseManager\Edd\License;
 use Multicoin\AddressValidator\WalletAddressValidator;
 use TheFrosty\WpUtilities\Api\WpRemote;
 use WP_Error;
 use function apply_filters;
 use function array_merge;
 use function esc_url;
+use function home_url;
 use function json_encode;
 use function sprintf;
 use const JSON_THROW_ON_ERROR;
+use const WpX402\WpX402\PLUGIN_SLUG;
 use const WpX402\WpX402\VERSION;
 
 /**
@@ -33,9 +36,11 @@ class Api
     public const string HEADER_PAYMENT_REQUIRED = 'PAYMENT-REQUIRED';
     public const string HEADER_PAYMENT_SIGNATURE = 'PAYMENT-SIGNATURE';
     public const string HEADER_X_PAYMENT = 'X-PAYMENT';
+    public const string LICENSE = 'license';
     public const string NETWORK = 'network';
     public const string PAYMENT_REQUIREMENTS = 'paymentRequirements';
     public const string PAYMENT_SIGNATURE = 'paymentSignature';
+    public const string SITE_URL = 'url';
     final public const string URL = 'https://api.wp-x402.com';
 
     final public const string USER_AGENT = 'WpX402';
@@ -62,7 +67,7 @@ class Api
     }
 
     /**
-     * Return a remote POST request.
+     * Return a remote POST request. Every request carries the site's license key and URL.
      * @param string $url URL.
      * @param array $data POST body data.
      * @param array $args Additional POST request args.
@@ -71,6 +76,11 @@ class Api
      */
     public static function wpRemote(string $url, array $data, array $args = []): array|WP_Error
     {
+        // The API only serves licensed sites.
+        $data += [
+            self::LICENSE => (string)License::getLicenseKey(PLUGIN_SLUG),
+            self::SITE_URL => home_url(),
+        ];
         $defaults = [
             'body' => json_encode($data, JSON_THROW_ON_ERROR),
             'headers' => ['Content-Type' => 'application/json'],
