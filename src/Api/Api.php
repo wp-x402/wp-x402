@@ -26,6 +26,7 @@ class Api
 
     public const string ACTION = 'wp_x402';
     public const string ACTION_COLLECT = 'collect';
+    public const string ACTION_SETTLE = 'settle';
     public const string ACTION_VERIFY = 'verify';
     public const string HEADER_X_402 = 'X-402';
     public const string HEADER_PAYMENT_RESPONSE = 'PAYMENT-RESPONSE';

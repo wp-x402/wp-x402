@@ -142,4 +142,43 @@ class ForBotsTest extends TestCase
         $this->assertSame([], $this->invoke(ForBots::class, 'getJsonBody', ['body' => '"a string"']));
         $this->assertSame([], $this->invoke(ForBots::class, 'getJsonBody', ['body' => '']));
     }
+
+    /**
+     * Response code, response body, is settled.
+     * @return array<string, array{int, string, bool}>
+     */
+    public static function settlementProvider(): array
+    {
+        return [
+            'settled' => [200, '{"success":true,"transaction":"0x1234","network":"eip155:84532"}', true],
+            'failed' => [200, '{"success":false,"errorReason":"insufficient_funds","transaction":""}', false],
+            'error status' => [500, '{"success":true}', false],
+            'not json' => [200, 'oops', false],
+        ];
+    }
+
+    /**
+     * Test isSettled() only accepts a 200 with `success: true`.
+     */
+    #[DataProvider('settlementProvider')]
+    public function testIsSettled(int $code, string $body, bool $expected): void
+    {
+        $response = ['response' => ['code' => $code, 'message' => ''], 'body' => $body, 'headers' => []];
+        $this->assertSame($expected, $this->invoke(ForBots::class, 'isSettled', $response));
+    }
+
+    /**
+     * Test facilitate() posts settle requests to the settle endpoint.
+     */
+    public function testFacilitateSettle(): void
+    {
+        $this->fakeHttp(['success' => true]);
+        $paywall = new ForBots();
+        $payment_required = $this->invoke($paywall, 'getPaymentRequired', 'https://example.org/post/');
+
+        $this->invoke($paywall, 'facilitate', Api::ACTION_SETTLE, $payment_required, 'c2ln');
+        $this->assertSame('https://api.wp-x402.com/settle', $this->requests[0]['url']);
+        $body = json_decode($this->requests[0]['args']['body'], true, flags: JSON_THROW_ON_ERROR);
+        $this->assertSame(Api::ACTION_SETTLE, $body[Api::ACTION]);
+    }
 }

@@ -171,18 +171,34 @@ class ForBots extends AbstractPaywall
                 'date' => get_the_date('c', $post),
             ];
             $data = apply_filters('wp_x402_response_data', $data, $post);
-            $this->sendJsonResponse($data, WP_Http::OK, [
-                Api::HEADER_PAYMENT_RESPONSE => wp_remote_retrieve_body($response),
-            ]);
 
-            // Telemetry: Success.
-            telemetry(EventType::SUCCESS, ['signature' => $paymentSignature]);
-            exitOrThrow();
+            // Settle once the resource is ready and before responding (x402's "verify, serve, settle"):
+            // verifying alone doesn't move any funds.
+            $settlement = $this->facilitate(Api::ACTION_SETTLE, $payment_required, $paymentSignature);
+            if (!is_wp_error($settlement) && self::isSettled($settlement)) {
+                $settled = self::getJsonBody($settlement);
+                $this->sendJsonResponse($data, WP_Http::OK, [
+                    Api::HEADER_PAYMENT_RESPONSE => base64_encode(json_encode($settled, JSON_THROW_ON_ERROR)),
+                ]);
+
+                // Telemetry: Success.
+                telemetry(
+                    EventType::SUCCESS,
+                    ['signature' => $paymentSignature, 'transaction' => $settled['transaction'] ?? '']
+                );
+                exitOrThrow();
+            }
+
+            // Settlement failed: report its reason below.
+            $response_code = is_wp_error($settlement) ? 0 : wp_remote_retrieve_response_code($settlement);
+            $verification = is_wp_error($settlement) ?
+                ['error' => $settlement->get_error_message()] :
+                self::getJsonBody($settlement);
         }
 
         // Payment Invalid (likely): offer the requirements again, with the facilitator's reason.
         status_header(WP_Http::PAYMENT_REQUIRED);
-        $reason = $verification['invalidReason'] ?? $verification['error'] ?? null;
+        $reason = $verification['invalidReason'] ?? $verification['errorReason'] ?? $verification['error'] ?? null;
         $payment_required->setError(
             is_string($reason) && $reason !== '' ?
                 sprintf(esc_html__('Payment invalid: %s', 'wp-x402'), $reason) :
@@ -220,6 +236,17 @@ class ForBots extends AbstractPaywall
     }
 
     /**
+     * Did the facilitator settle the payment? Only a 200 with `success: true` counts.
+     * @param array $response A `wp_remote_*()` response.
+     * @return bool
+     */
+    protected static function isSettled(array $response): bool
+    {
+        return wp_remote_retrieve_response_code($response) === WP_Http::OK &&
+            (self::getJsonBody($response)['success'] ?? false) === true;
+    }
+
+    /**
      * Decode a `wp_remote_*()` response's JSON body.
      * @param array $response
      * @return array<string, mixed> The decoded object, or an empty array when the body isn't a JSON object.
@@ -236,8 +263,8 @@ class ForBots extends AbstractPaywall
     }
 
     /**
-     * Send the payment to our API, which forwards it to the facilitator's `verify` (or `settle`) endpoint.
-     * @param string $action The API action, e.g. Api::ACTION_VERIFY.
+     * Send the payment to our API, which forwards it to the facilitator's `verify` or `settle` endpoint.
+     * @param string $action Api::ACTION_VERIFY or Api::ACTION_SETTLE.
      * @param PaymentRequired $payment_required
      * @param string $signature The PAYMENT-SIGNATURE header value.
      * @return array|WP_Error
