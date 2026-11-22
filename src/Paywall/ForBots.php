@@ -73,7 +73,8 @@ class ForBots extends AbstractPaywall
         }
 
         $user_agent = $this->getRequest()?->server->get('HTTP_USER_AGENT', '');
-        $is_fake_bot = $this->getRequest()?->query->has('fakeBot');
+        // `?fakeBot` lets developers test the bot flow from a browser; never in production.
+        $is_fake_bot = $this->isDebug() && $this->getRequest()?->query->has('fakeBot');
 
         $agents = Bots::getAgents();
         if (!$agents) {
@@ -206,7 +207,7 @@ class ForBots extends AbstractPaywall
         );
 
         $data = [PaymentRequired::ERROR => $payment_required->getError()];
-        if (true) { // @TODO: Create a debug function for local development.
+        if ($this->isDebug()) {
             $data['extra'] = ['code' => $response_code, 'message' => $verification];
         }
         $this->sendJsonResponse(
