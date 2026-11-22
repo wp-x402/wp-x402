@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace WpX402\WpX402\Tests\Api;
 
+use Dwnload\EddSoftwareLicenseManager\Edd\License;
 use Multicoin\AddressValidator\CurrencyFactory;
 use Multicoin\AddressValidator\WalletAddressValidator;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -11,9 +12,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use WpX402\WpX402\Api\Api;
 use WpX402\WpX402\Tests\TestCase;
 use function add_filter;
+use function home_url;
 use function json_decode;
 use function remove_all_filters;
 use const JSON_THROW_ON_ERROR;
+use const WpX402\WpX402\PLUGIN_SLUG;
 use const WpX402\WpX402\VERSION;
 
 /**
@@ -74,7 +77,10 @@ class ApiTest extends TestCase
         $request = $this->requests[0];
         $this->assertSame('https://api.wp-x402.com/verify', $request['url']);
         $this->assertSame('POST', $request['args']['method']);
-        $this->assertSame(['foo' => 'bar'], json_decode($request['args']['body'], true, flags: JSON_THROW_ON_ERROR));
+        $this->assertSame(
+            ['foo' => 'bar', Api::LICENSE => (string)License::getLicenseKey(PLUGIN_SLUG), Api::SITE_URL => home_url()],
+            json_decode($request['args']['body'], true, flags: JSON_THROW_ON_ERROR)
+        );
         $this->assertSame('application/json', $request['args']['headers']['Content-Type']);
         $this->assertStringStartsWith(Api::USER_AGENT . '/' . VERSION . '; ', $request['args']['user-agent']);
     }
