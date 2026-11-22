@@ -59,4 +59,19 @@ class AbstractPaywallTest extends TestCase
 
         $this->assertSame($expected, $this->invoke(new ForBots(), 'getPaymentSignature'));
     }
+
+    /**
+     * Test buildJsonResponse() marks paywall responses as uncacheable and varying on the payment headers.
+     */
+    public function testBuildJsonResponse(): void
+    {
+        $response = $this->invoke(new ForBots(), 'buildJsonResponse', ['error' => 'Payment Required'], 402, ['X-Test' => 'yes']);
+
+        $this->assertSame(402, $response->getStatusCode());
+        $this->assertSame('{"error":"Payment Required"}', $response->getContent());
+        $this->assertSame('yes', $response->headers->get('X-Test'));
+        $this->assertStringContainsString('no-store', (string)$response->headers->get('Cache-Control'));
+        $this->assertStringContainsString('private', (string)$response->headers->get('Cache-Control'));
+        $this->assertSame('PAYMENT-SIGNATURE, X-PAYMENT', $response->headers->get('Vary'));
+    }
 }
