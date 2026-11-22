@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WpX402\WpX402\Tests\Paywall;
 
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
 use WpX402\WpX402\Api\Api;
 use WpX402\WpX402\Models\PaymentRequired;
@@ -101,5 +102,44 @@ class ForBotsTest extends TestCase
         $body = json_decode($this->requests[0]['args']['body'], true, flags: JSON_THROW_ON_ERROR);
         $this->assertSame('mainnet', $body[Api::NETWORK]);
         $this->assertSame('c2ln', $body[Api::PAYMENT_SIGNATURE]);
+    }
+
+    /**
+     * Response code, response body, is valid.
+     * @return array<string, array{int, string, bool}>
+     */
+    public static function verificationProvider(): array
+    {
+        return [
+            'valid' => [200, '{"isValid":true,"payer":"0x857b06519E91e3A54538791bDbb0E22373e36b66"}', true],
+            'invalid' => [200, '{"isValid":false,"invalidReason":"insufficient_funds"}', false],
+            'truthy is not true' => [200, '{"isValid":"true"}', false],
+            'valid body, error status' => [202, '{"isValid":true}', false],
+            'api error' => [401, '{"error":"`PAYMENT-SIGNATURE` header is required"}', false],
+            'not json' => [200, '<html></html>', false],
+        ];
+    }
+
+    /**
+     * Test isPaymentValid() only accepts a 200 with `isValid: true`.
+     */
+    #[DataProvider('verificationProvider')]
+    public function testIsPaymentValid(int $code, string $body, bool $expected): void
+    {
+        $response = ['response' => ['code' => $code, 'message' => ''], 'body' => $body, 'headers' => []];
+        $this->assertSame($expected, $this->invoke(ForBots::class, 'isPaymentValid', $response));
+    }
+
+    /**
+     * Test getJsonBody().
+     */
+    public function testGetJsonBody(): void
+    {
+        $this->assertSame(
+            ['isValid' => false, 'invalidReason' => 'insufficient_funds'],
+            $this->invoke(ForBots::class, 'getJsonBody', ['body' => '{"isValid":false,"invalidReason":"insufficient_funds"}'])
+        );
+        $this->assertSame([], $this->invoke(ForBots::class, 'getJsonBody', ['body' => '"a string"']));
+        $this->assertSame([], $this->invoke(ForBots::class, 'getJsonBody', ['body' => '']));
     }
 }

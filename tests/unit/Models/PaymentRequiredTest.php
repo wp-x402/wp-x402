@@ -55,6 +55,7 @@ class PaymentRequiredTest extends TestCase
         $this->assertSame(
             [
                 'x402Version' => 2,
+                'error' => 'PAYMENT-SIGNATURE header is required',
                 'resource' => [
                     'url' => 'https://example.org/post/',
                     'description' => 'Payment Required',

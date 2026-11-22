@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace WpX402\WpX402\Paywall;
 
 use Dwnload\EddSoftwareLicenseManager\Edd\License;
+use JsonException;
 use ReflectionClass;
 use WP_Error;
 use WP_Http;
@@ -25,9 +26,12 @@ use function get_the_category;
 use function get_the_date;
 use function get_the_ID;
 use function get_the_title;
+use function is_array;
 use function is_attachment;
 use function is_singular;
+use function is_string;
 use function is_wp_error;
+use function json_decode;
 use function json_encode;
 use function sprintf;
 use function status_header;
@@ -154,8 +158,9 @@ class ForBots extends AbstractPaywall
         }
 
         $response_code = wp_remote_retrieve_response_code($response);
+        $verification = self::getJsonBody($response);
 
-        if ($response_code === WP_Http::ACCEPTED) {
+        if (self::isPaymentValid($response)) {
             $post = get_post();
             $data = [
                 'status' => 'paid',
@@ -175,19 +180,24 @@ class ForBots extends AbstractPaywall
             exitOrThrow();
         }
 
-        // Payment Invalid (likely).
+        // Payment Invalid (likely): offer the requirements again, with the facilitator's reason.
         status_header(WP_Http::PAYMENT_REQUIRED);
-        $payment_required->setError(esc_html__('Payment Invalid or Expired.', 'wp-x402'));
+        $reason = $verification['invalidReason'] ?? $verification['error'] ?? null;
+        $payment_required->setError(
+            is_string($reason) && $reason !== '' ?
+                sprintf(esc_html__('Payment invalid: %s', 'wp-x402'), $reason) :
+                esc_html__('Payment Invalid or Expired.', 'wp-x402')
+        );
 
         $data = [PaymentRequired::ERROR => $payment_required->getError()];
         if (true) { // @TODO: Create a debug function for local development.
-            $data['extra'] = ['code' => $response_code, 'message' => json_decode(wp_remote_retrieve_body($response))];
+            $data['extra'] = ['code' => $response_code, 'message' => $verification];
         }
         $this->sendJsonResponse(
             $data,
             WP_Http::PAYMENT_REQUIRED,
             [
-                Api::HEADER_PAYMENT_RESPONSE => base64_encode(
+                Api::HEADER_PAYMENT_REQUIRED => base64_encode(
                     json_encode($payment_required->toArray(), JSON_THROW_ON_ERROR)
                 ),
             ]
@@ -196,6 +206,33 @@ class ForBots extends AbstractPaywall
         // Telemetry: Failed.
         telemetry(EventType::FAILED, ['signature' => $paymentSignature, 'code' => $response_code]);
         exitOrThrow();
+    }
+
+    /**
+     * Did the facilitator say the payment is valid? Only a 200 with `isValid: true` counts.
+     * @param array $response A `wp_remote_*()` response.
+     * @return bool
+     */
+    protected static function isPaymentValid(array $response): bool
+    {
+        return wp_remote_retrieve_response_code($response) === WP_Http::OK &&
+            (self::getJsonBody($response)['isValid'] ?? false) === true;
+    }
+
+    /**
+     * Decode a `wp_remote_*()` response's JSON body.
+     * @param array $response
+     * @return array<string, mixed> The decoded object, or an empty array when the body isn't a JSON object.
+     */
+    protected static function getJsonBody(array $response): array
+    {
+        try {
+            $body = json_decode(wp_remote_retrieve_body($response), true, flags: JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            return [];
+        }
+
+        return is_array($body) ? $body : [];
     }
 
     /**

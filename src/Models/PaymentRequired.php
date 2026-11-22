@@ -34,7 +34,7 @@ class PaymentRequired extends BaseModel
         $this->x402Version = $x402Version;
     }
 
-    protected string $error;
+    protected string $error = '';
 
     public function getError(): string
     {
@@ -95,6 +95,7 @@ class PaymentRequired extends BaseModel
     {
         return [
             self::VERSION,
+            self::ERROR,
             self::RESOURCE,
             self::ACCEPTS,
             self::PAYLOAD,
