@@ -32,7 +32,7 @@ class ApiTest extends TestCase
     {
         return [
             'evm' => ['0x209693Bc6afc0C5328bA36FaF03C514EF312287C', true],
-            'solana' => ['CKPKJWNdJEqa81x7CkZ14BVPiY6y16Sxs7owznqtWYp5', true],
+            'solana' => ['EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', true],
             'empty' => ['', false],
             'garbage' => ['not-a-wallet', false],
         ];

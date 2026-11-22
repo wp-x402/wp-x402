@@ -40,7 +40,7 @@ class SettingTest extends TestCase
      */
     public function testSavedSettings(): void
     {
-        $wallet = 'CKPKJWNdJEqa81x7CkZ14BVPiY6y16Sxs7owznqtWYp5';
+        $wallet = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v';
         $this->setGeneralSettings([
             General::ACCOUNT => 'solana',
             sprintf(General::WALLET, 'solana') => $wallet,
