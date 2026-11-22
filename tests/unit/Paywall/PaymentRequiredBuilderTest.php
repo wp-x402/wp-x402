@@ -24,6 +24,7 @@ use function sprintf;
  * @package WpX402\WpX402\Tests\Paywall
  */
 #[CoversMethod(AbstractPaywall::class, 'getPaymentRequired')]
+#[CoversMethod(AbstractPaywall::class, 'getExtra')]
 #[UsesClass(PaymentRequired::class)]
 #[UsesClass(Accepts::class)]
 #[UsesClass(UrlResource::class)]
@@ -57,6 +58,24 @@ class PaymentRequiredBuilderTest extends TestCase
         $this->assertSame('10000', $accepts->getAmount());
         $this->assertSame(self::EVM_WALLET, $accepts->getPayTo());
         $this->assertSame(60, $accepts->getMaxTimeoutSeconds());
+        $this->assertSame(['name' => 'USDC', 'version' => '2'], $accepts->getExtra());
+    }
+
+    /**
+     * Test mainnet EVM requirements use the Base USDC EIP-712 domain name.
+     */
+    public function testMainnetEvm(): void
+    {
+        $this->setGeneralSettings([
+            General::ACCOUNT => 'base',
+            General::NETWORK => Mainnet::class,
+            sprintf(General::WALLET, 'base') => self::EVM_WALLET,
+        ]);
+
+        $accepts = $this->build('https://example.org/post/')->getAccepts()[0];
+        $this->assertSame(Mainnet::BASE->value, $accepts->getNetwork());
+        $this->assertSame(Mainnet::ASSET_BASE->value, $accepts->getAsset());
+        $this->assertSame(['name' => 'USD Coin', 'version' => '2'], $accepts->getExtra());
     }
 
     /**
@@ -77,6 +96,7 @@ class PaymentRequiredBuilderTest extends TestCase
         $this->assertSame(Mainnet::ASSET_SOLANA->value, $accepts->getAsset());
         $this->assertSame('250000', $accepts->getAmount());
         $this->assertSame($wallet, $accepts->getPayTo());
+        $this->assertNull($accepts->getExtra());
     }
 
     /**
