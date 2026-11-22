@@ -6,6 +6,7 @@ namespace WpX402\WpX402\Paywall;
 
 use Dwnload\EddSoftwareLicenseManager\Edd\License;
 use ReflectionClass;
+use WP_Error;
 use WP_Http;
 use WpX402\WpX402\Api\Api;
 use WpX402\WpX402\Api\Bots;
@@ -141,17 +142,7 @@ class ForBots extends AbstractPaywall
         }
 
         // Scenario B: Verify Payment Hash.
-        $response = Api::wpRemote(
-            Api::getApiUrl(Api::ACTION_VERIFY),
-            [
-                Api::ACTION => Api::ACTION_VERIFY,
-                Api::NETWORK => strtolower((new ReflectionClass(Setting::getNetwork()))->getShortName()),
-                Api::PAYMENT_REQUIREMENTS => base64_encode(
-                    json_encode($payment_required->toArray(), JSON_THROW_ON_ERROR)
-                ),
-                Api::PAYMENT_SIGNATURE => $paymentSignature,
-            ]
-        );
+        $response = $this->facilitate(Api::ACTION_VERIFY, $payment_required, $paymentSignature);
 
         if (is_wp_error($response)) {
             status_header(WP_Http::BAD_REQUEST);
@@ -205,5 +196,46 @@ class ForBots extends AbstractPaywall
         // Telemetry: Failed.
         telemetry(EventType::FAILED, ['signature' => $paymentSignature, 'code' => $response_code]);
         exitOrThrow();
+    }
+
+    /**
+     * Send the payment to our API, which forwards it to the facilitator's `verify` (or `settle`) endpoint.
+     * @param string $action The API action, e.g. Api::ACTION_VERIFY.
+     * @param PaymentRequired $payment_required
+     * @param string $signature The PAYMENT-SIGNATURE header value.
+     * @return array|WP_Error
+     * @throws \JsonException
+     */
+    protected function facilitate(
+        string $action,
+        PaymentRequired $payment_required,
+        string $signature
+    ): array|WP_Error {
+        return Api::wpRemote(
+            Api::getApiUrl($action),
+            $this->getFacilitatorData($action, $payment_required, $signature)
+        );
+    }
+
+    /**
+     * Build the API request data. The facilitator wants the single requirements entry the client paid
+     * against (not the whole PaymentRequired object), and the client's PaymentPayload, which is the
+     * PAYMENT-SIGNATURE value.
+     * @param string $action
+     * @param PaymentRequired $payment_required
+     * @param string $signature
+     * @return array<string, string>
+     * @throws \JsonException
+     */
+    protected function getFacilitatorData(string $action, PaymentRequired $payment_required, string $signature): array
+    {
+        return [
+            Api::ACTION => $action,
+            Api::NETWORK => strtolower((new ReflectionClass(Setting::getNetwork()))->getShortName()),
+            Api::PAYMENT_REQUIREMENTS => base64_encode(
+                json_encode($payment_required->getAccepts()[0]->toArray(), JSON_THROW_ON_ERROR)
+            ),
+            Api::PAYMENT_SIGNATURE => $signature,
+        ];
     }
 }
