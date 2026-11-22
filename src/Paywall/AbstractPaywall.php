@@ -91,13 +91,27 @@ abstract class AbstractPaywall extends AbstractContainerProvider implements
                     Accepts::ASSET => $network::getAsset($account)->value,
                     Accepts::PAY_TO => Setting::getWallet(),
                     Accepts::MAX_TIMEOUT_SECONDS => 60,
-                    Accepts::EXTRA => [
-                        'name' => 'USDC',
-                        'version' => 2,
-                    ],
+                    Accepts::EXTRA => self::getExtra($network::getBase($account)->value),
                 ],
             ],
         ]);
+    }
+
+    /**
+     * Return the scheme specific `extra` field for a CAIP-2 network.
+     * EVM `exact` payments sign an EIP-3009 authorization, so clients need the token's EIP-712 domain
+     * name and version. USDC's domain name is "USD Coin" on Base and "USDC" on Base Sepolia.
+     * Solana needs the facilitator's fee payer instead, which isn't known here yet, so it gets none.
+     * @param string $network
+     * @return array<string, string>|null
+     */
+    protected static function getExtra(string $network): ?array
+    {
+        return match ($network) {
+            Mainnet::BASE->value => ['name' => 'USD Coin', 'version' => '2'],
+            Testnet::BASE->value => ['name' => 'USDC', 'version' => '2'],
+            default => null,
+        };
     }
 
     /**
