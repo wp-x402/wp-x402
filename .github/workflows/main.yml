@@ -106,7 +106,6 @@ jobs:
 
   run-phpunit:
     name: Run PHPUnit
-    if: ${{ false }} # Disabled until tests are added.
     runs-on: ubuntu-latest
     strategy:
       matrix:

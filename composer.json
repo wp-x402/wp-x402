@@ -59,6 +59,11 @@
       "WpX402\\WpX402\\": "src"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "WpX402\\WpX402\\Tests\\": "tests/unit"
+    }
+  },
   "extra": {
     "assets-dir": "assets/vendor",
     "assets-files": {
