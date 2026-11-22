@@ -224,7 +224,7 @@ class ForBots extends AbstractPaywall
             return true;
         }
 
-        $user_agent = (string)$this->getRequest()?->server->get('HTTP_USER_AGENT', '');
+        $user_agent = (string)$this->getRequest()?->headers->get('User-Agent', '');
         if ($user_agent === '') {
             return false;
         }
@@ -240,7 +240,7 @@ class ForBots extends AbstractPaywall
 
     /**
      * Did the facilitator say the payment is valid? Only a 200 with `isValid: true` counts.
-     * @param array $response A `wp_remote_*()` response.
+     * @param array<mixed> $response A `wp_remote_*()` response.
      * @return bool
      */
     protected static function isPaymentValid(array $response): bool
@@ -251,7 +251,7 @@ class ForBots extends AbstractPaywall
 
     /**
      * Did the facilitator settle the payment? Only a 200 with `success: true` counts.
-     * @param array $response A `wp_remote_*()` response.
+     * @param array<mixed> $response A `wp_remote_*()` response.
      * @return bool
      */
     protected static function isSettled(array $response): bool
@@ -262,8 +262,8 @@ class ForBots extends AbstractPaywall
 
     /**
      * Decode a `wp_remote_*()` response's JSON body.
-     * @param array $response
-     * @return array<string, mixed> The decoded object, or an empty array when the body isn't a JSON object.
+     * @param array<mixed> $response
+     * @return array<mixed> The decoded object, or an empty array when the body isn't a JSON object.
      */
     protected static function getJsonBody(array $response): array
     {
@@ -281,7 +281,7 @@ class ForBots extends AbstractPaywall
      * @param string $action Api::ACTION_VERIFY or Api::ACTION_SETTLE.
      * @param PaymentRequired $payment_required
      * @param string $signature The PAYMENT-SIGNATURE header value.
-     * @return array|WP_Error
+     * @return array<mixed>|WP_Error
      * @throws \JsonException
      */
     protected function facilitate(
