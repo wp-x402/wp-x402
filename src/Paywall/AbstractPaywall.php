@@ -123,6 +123,27 @@ abstract class AbstractPaywall extends AbstractContainerProvider implements
      */
     protected function sendJsonResponse(mixed $data = null, int $status = WP_Http::OK, array $headers = []): Response
     {
-        return (new JsonResponse($data, $status, $headers))->send();
+        return $this->buildJsonResponse($data, $status, $headers)->send();
+    }
+
+    /**
+     * Build a JSON Response. Paywall responses depend on the payment headers and may hold paid content,
+     * so page caches and CDNs must not store them or serve one client's response to another.
+     * @param mixed|null $data
+     * @param int $status
+     * @param array $headers
+     * @return JsonResponse
+     */
+    protected function buildJsonResponse(
+        mixed $data = null,
+        int $status = WP_Http::OK,
+        array $headers = []
+    ): JsonResponse {
+        $headers += [
+            'Cache-Control' => 'no-store, private',
+            'Vary' => sprintf('%s, %s', Api::HEADER_PAYMENT_SIGNATURE, Api::HEADER_X_PAYMENT),
+        ];
+
+        return new JsonResponse($data, $status, $headers);
     }
 }
