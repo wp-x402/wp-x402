@@ -18,6 +18,8 @@ use function sprintf;
 class Setting
 {
 
+    public const int USDC_DECIMALS = 6;
+
     /**
      * Is telemetry allowed?
      * @return bool
@@ -75,6 +77,19 @@ class Setting
         $price = (float)self::getGeneralSetting(General::PRICE, PaywallInterface::DEFAULT_PRICE);
         $formatter = new NumberFormatter('en_US', NumberFormatter::CURRENCY);
         return sanitize_text_field($formatter->formatCurrency($price, 'USD'));
+    }
+
+    /**
+     * Return the price in the asset's atomic units, as the x402 `amount` field requires.
+     * USDC uses 6 decimals, so a price of 0.01 is "10000".
+     * @param int $decimals The asset's decimals.
+     * @return string
+     */
+    public static function getAmount(int $decimals = self::USDC_DECIMALS): string
+    {
+        $price = (float)self::getGeneralSetting(General::PRICE, PaywallInterface::DEFAULT_PRICE);
+
+        return (string)max(0, (int)round($price * (10 ** $decimals)));
     }
 
     /**
