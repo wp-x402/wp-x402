@@ -12,9 +12,6 @@ use WpX402\WpX402\Api\Bots;
 use WpX402\WpX402\Models\PaymentRequired;
 use WpX402\WpX402\Models\PaymentRequired\Accepts;
 use WpX402\WpX402\Models\PaymentRequired\UrlResource;
-use WpX402\WpX402\Networks\Mainnet;
-use WpX402\WpX402\Networks\Testnet;
-use WpX402\WpX402\Schema\Payment;
 use WpX402\WpX402\ServiceProvider;
 use WpX402\WpX402\Settings\Setting;
 use WpX402\WpX402\Telemetry\EventType;
@@ -91,7 +88,6 @@ class ForBots extends AbstractPaywall
         }
 
         // 1. Validate the wallet.
-        $account = Setting::getAccount();
         $wallet = Setting::getWallet();
         $validator = $this->getContainer()?->get(ServiceProvider::WALLET_ADDRESS_VALIDATOR);
         if (!Api::isValidWallet($validator, $wallet)) {
@@ -115,37 +111,7 @@ class ForBots extends AbstractPaywall
             return;
         }
 
-        $is_mainnet = Setting::isMainnet();
-
-        $payment_required = new PaymentRequired([
-            PaymentRequired::ERROR => sprintf(
-                esc_html__('`%s` header is required', 'wp-x402'),
-                Api::HEADER_PAYMENT_SIGNATURE
-            ),
-            PaymentRequired::RESOURCE => [
-                UrlResource::URL => get_permalink(),
-                UrlResource::DESCRIPTION => Entitlement::PAYMENT_REQUIRED->label(),
-                UrlResource::MIME_TYPE => 'text/html',
-            ],
-            PaymentRequired::ACCEPTS => [
-                [
-                    Accepts::SCHEME => Payment::from('exact')->value,
-                    Accepts::NETWORK => $is_mainnet ?
-                        Mainnet::getBase($account)->value :
-                        Testnet::getBase($account)->value,
-                    Accepts::AMOUNT => Setting::getAmount(),
-                    Accepts::ASSET => $is_mainnet ?
-                        Mainnet::getAsset($account)->value :
-                        Testnet::getAsset($account)->value,
-                    Accepts::PAY_TO => $wallet,
-                    Accepts::MAX_TIMEOUT_SECONDS => 60,
-                    Accepts::EXTRA => [
-                        'name' => 'USDC',
-                        'version' => 2,
-                    ],
-                ],
-            ],
-        ]);
+        $payment_required = $this->getPaymentRequired((string)get_permalink());
 
         // 4. Check for Payment Header.
         $paymentSignature = $this->getPaymentSignature();
@@ -167,9 +133,7 @@ class ForBots extends AbstractPaywall
             telemetry(
                 EventType::REQUIRED,
                 [
-                    Accepts::NETWORK => $is_mainnet ?
-                        Mainnet::getBase($account)->value :
-                        Testnet::getBase($account)->value,
+                    Accepts::NETWORK => $payment_required->getAccepts()[0]->getNetwork(),
                     UrlResource::URL => $payment_required->getResource()->getUrl(),
                 ]
             );
