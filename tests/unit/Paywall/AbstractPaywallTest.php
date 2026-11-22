@@ -11,7 +11,9 @@ use WpX402\WpX402\Api\Api;
 use WpX402\WpX402\Paywall\AbstractPaywall;
 use WpX402\WpX402\Paywall\ForBots;
 use WpX402\WpX402\Tests\TestCase;
+use function add_filter;
 use function base64_encode;
+use function remove_all_filters;
 
 /**
  * Class AbstractPaywallTest
@@ -73,5 +75,18 @@ class AbstractPaywallTest extends TestCase
         $this->assertStringContainsString('no-store', (string)$response->headers->get('Cache-Control'));
         $this->assertStringContainsString('private', (string)$response->headers->get('Cache-Control'));
         $this->assertSame('PAYMENT-SIGNATURE, X-PAYMENT', $response->headers->get('Vary'));
+    }
+
+    /**
+     * Test isDebug() follows WP_DEBUG (on in the test config) and the `wp_x402_debug` filter.
+     */
+    public function testIsDebug(): void
+    {
+        $paywall = new ForBots();
+        $this->assertSame(WP_DEBUG, $this->invoke($paywall, 'isDebug'));
+
+        add_filter('wp_x402_debug', '__return_false');
+        $this->assertFalse($this->invoke($paywall, 'isDebug'));
+        remove_all_filters('wp_x402_debug');
     }
 }

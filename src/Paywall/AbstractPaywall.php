@@ -19,7 +19,9 @@ use WpX402\WpX402\Networks\Mainnet;
 use WpX402\WpX402\Networks\Testnet;
 use WpX402\WpX402\Schema\Payment;
 use WpX402\WpX402\Settings\Setting;
+use function apply_filters;
 use function base64_encode;
+use function defined;
 use function esc_html__;
 use function sprintf;
 
@@ -112,6 +114,16 @@ abstract class AbstractPaywall extends AbstractContainerProvider implements
             Testnet::BASE->value => ['name' => 'USDC', 'version' => '2'],
             default => null,
         };
+    }
+
+    /**
+     * Is debug output allowed? Defaults to WP_DEBUG; filter with `wp_x402_debug`.
+     * Debug mode adds the facilitator's response to failed payment responses, and enables `?fakeBot`.
+     * @return bool
+     */
+    protected function isDebug(): bool
+    {
+        return (bool)apply_filters('wp_x402_debug', defined('WP_DEBUG') && WP_DEBUG);
     }
 
     /**
