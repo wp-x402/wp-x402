@@ -84,7 +84,7 @@ class ForHumans extends AbstractPaywall
                     Accepts::NETWORK => $is_mainnet ?
                         Mainnet::getBase($account)->value :
                         Testnet::getBase($account)->value,
-                    Accepts::AMOUNT => Setting::getPrice(),
+                    Accepts::AMOUNT => Setting::getAmount(),
                     Accepts::ASSET => $is_mainnet ?
                         Mainnet::getAsset($account)->value :
                         Testnet::getAsset($account)->value,
