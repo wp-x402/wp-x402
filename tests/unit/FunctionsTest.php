@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace WpX402\WpX402\Tests;
 
 use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\UsesClass;
+use WpX402\WpX402\Api\Api;
 use WpX402\WpX402\Middleware\Middleware;
 use WpX402\WpX402\Settings\Misc;
+use WpX402\WpX402\Settings\Setting;
 use WpX402\WpX402\Telemetry\EventType;
 use function json_decode;
 use function WpX402\WpX402\middleware;
@@ -20,6 +23,8 @@ use const JSON_THROW_ON_ERROR;
 #[CoversFunction('WpX402\WpX402\middleware')]
 #[CoversFunction('WpX402\WpX402\telemetry')]
 #[CoversFunction('WpX402\WpX402\anonymizer')]
+#[UsesClass(Api::class)]
+#[UsesClass(Setting::class)]
 class FunctionsTest extends TestCase
 {
 
