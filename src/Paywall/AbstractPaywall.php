@@ -12,7 +12,16 @@ use TheFrosty\WpUtilities\Plugin\HttpFoundationRequestInterface;
 use TheFrosty\WpUtilities\Plugin\HttpFoundationRequestTrait;
 use WP_Http;
 use WpX402\WpX402\Api\Api;
+use WpX402\WpX402\Models\PaymentRequired;
+use WpX402\WpX402\Models\PaymentRequired\Accepts;
+use WpX402\WpX402\Models\PaymentRequired\UrlResource;
+use WpX402\WpX402\Networks\Mainnet;
+use WpX402\WpX402\Networks\Testnet;
+use WpX402\WpX402\Schema\Payment;
+use WpX402\WpX402\Settings\Setting;
 use function base64_encode;
+use function esc_html__;
+use function sprintf;
 
 /**
  * Class AbstractPaywall
@@ -52,6 +61,43 @@ abstract class AbstractPaywall extends AbstractContainerProvider implements
         }
 
         return null;
+    }
+
+    /**
+     * Build the x402 PaymentRequired model for a resource from the current settings.
+     * @param string $url The resource URL.
+     * @return PaymentRequired
+     */
+    protected function getPaymentRequired(string $url): PaymentRequired
+    {
+        $account = Setting::getAccount();
+        $network = Setting::isMainnet() ? Mainnet::class : Testnet::class;
+
+        return new PaymentRequired([
+            PaymentRequired::ERROR => sprintf(
+                esc_html__('`%s` header is required', 'wp-x402'),
+                Api::HEADER_PAYMENT_SIGNATURE
+            ),
+            PaymentRequired::RESOURCE => [
+                UrlResource::URL => $url,
+                UrlResource::DESCRIPTION => Entitlement::PAYMENT_REQUIRED->label(),
+                UrlResource::MIME_TYPE => 'text/html',
+            ],
+            PaymentRequired::ACCEPTS => [
+                [
+                    Accepts::SCHEME => Payment::EXACT->value,
+                    Accepts::NETWORK => $network::getBase($account)->value,
+                    Accepts::AMOUNT => Setting::getAmount(),
+                    Accepts::ASSET => $network::getAsset($account)->value,
+                    Accepts::PAY_TO => Setting::getWallet(),
+                    Accepts::MAX_TIMEOUT_SECONDS => 60,
+                    Accepts::EXTRA => [
+                        'name' => 'USDC',
+                        'version' => 2,
+                    ],
+                ],
+            ],
+        ]);
     }
 
     /**
