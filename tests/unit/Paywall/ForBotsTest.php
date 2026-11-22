@@ -7,7 +7,9 @@ namespace WpX402\WpX402\Tests\Paywall;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
+use Symfony\Component\HttpFoundation\Request;
 use WpX402\WpX402\Api\Api;
+use WpX402\WpX402\Api\Bots;
 use WpX402\WpX402\Models\PaymentRequired;
 use WpX402\WpX402\Models\PaymentRequired\Accepts;
 use WpX402\WpX402\Models\PaymentRequired\UrlResource;
@@ -19,9 +21,11 @@ use WpX402\WpX402\Paywall\ForBots;
 use WpX402\WpX402\Settings\General;
 use WpX402\WpX402\Settings\Setting;
 use WpX402\WpX402\Tests\TestCase;
+use function add_filter;
 use function base64_decode;
 use function base64_encode;
 use function json_decode;
+use function remove_all_filters;
 use function sprintf;
 use const JSON_THROW_ON_ERROR;
 
@@ -32,6 +36,7 @@ use const JSON_THROW_ON_ERROR;
 #[CoversClass(ForBots::class)]
 #[UsesClass(AbstractPaywall::class)]
 #[UsesClass(Api::class)]
+#[UsesClass(Bots::class)]
 #[UsesClass(PaymentRequired::class)]
 #[UsesClass(Accepts::class)]
 #[UsesClass(UrlResource::class)]
@@ -54,6 +59,52 @@ class ForBotsTest extends TestCase
             General::ACCOUNT => 'base',
             sprintf(General::WALLET, 'base') => self::EVM_WALLET,
         ]);
+    }
+
+    /**
+     * Tear down.
+     */
+    public function tearDown(): void
+    {
+        $this->setStaticRequest(AbstractPaywall::class, null);
+        remove_all_filters('wp_x402_debug');
+        parent::tearDown();
+    }
+
+    /**
+     * Request headers, query, user agent, debug, is an x402 client.
+     * @return array<string, array{array<string, string>, array<string, string>, string, bool, bool}>
+     */
+    public static function clientProvider(): array
+    {
+        $signature = [Api::HEADER_PAYMENT_SIGNATURE => base64_encode('{"x402Version":2}')];
+        $browser = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/605.1.15 Safari/605.1.15';
+
+        return [
+            'payment from any user agent' => [$signature, [], $browser, false, true],
+            'known AI agent' => [[], [], 'Mozilla/5.0 (compatible; GPTBot/1.2; +https://openai.com/gptbot)', false, true],
+            'browser' => [[], [], $browser, false, false],
+            'no user agent' => [[], [], '', false, false],
+            'fakeBot when debugging' => [[], ['fakeBot' => '1'], $browser, true, true],
+            'fakeBot ignored without debug' => [[], ['fakeBot' => '1'], $browser, false, false],
+        ];
+    }
+
+    /**
+     * Test isX402Client().
+     * @param array<string, string> $headers
+     * @param array<string, string> $query
+     */
+    #[DataProvider('clientProvider')]
+    public function testIsX402Client(array $headers, array $query, string $agent, bool $debug, bool $expected): void
+    {
+        $this->fakeHttp(['GPTBot' => ['operator' => 'OpenAI'], 'ClaudeBot' => ['operator' => 'Anthropic']]);
+        add_filter('wp_x402_debug', $debug ? '__return_true' : '__return_false');
+        $request = new Request($query, server: $agent === '' ? [] : ['HTTP_USER_AGENT' => $agent]);
+        $request->headers->add($headers);
+        $this->setStaticRequest(AbstractPaywall::class, $request);
+
+        $this->assertSame($expected, $this->invoke(new ForBots(), 'isX402Client'));
     }
 
     /**
