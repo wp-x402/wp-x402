@@ -36,6 +36,7 @@ use function json_encode;
 use function sprintf;
 use function status_header;
 use function strip_tags;
+use function stripos;
 use function strtolower;
 use function TheFrosty\WpUtilities\exitOrThrow;
 use function wp_remote_retrieve_body;
@@ -72,24 +73,7 @@ class ForBots extends AbstractPaywall
             return;
         }
 
-        $user_agent = $this->getRequest()?->server->get('HTTP_USER_AGENT', '');
-        // `?fakeBot` lets developers test the bot flow from a browser; never in production.
-        $is_fake_bot = $this->isDebug() && $this->getRequest()?->query->has('fakeBot');
-
-        $agents = Bots::getAgents();
-        if (!$agents) {
-            return;
-        }
-
-        $is_bot_agent = false;
-        foreach (array_keys($agents) as $agent) {
-            if (stripos($user_agent, $agent) !== false) {
-                $is_bot_agent = true;
-                break;
-            }
-        }
-
-        if (!$is_bot_agent && !$is_fake_bot) {
+        if (!$this->isX402Client()) {
             return;
         }
 
@@ -223,6 +207,35 @@ class ForBots extends AbstractPaywall
         // Telemetry: Failed.
         telemetry(EventType::FAILED, ['signature' => $paymentSignature, 'code' => $response_code]);
         exitOrThrow();
+    }
+
+    /**
+     * Should this request get the x402 flow? Any client sending a payment does, whatever its user agent, as do
+     * known AI agents (ai.robots.txt), and `?fakeBot` when debugging.
+     * @return bool
+     */
+    protected function isX402Client(): bool
+    {
+        if ($this->getPaymentSignature() !== null) {
+            return true;
+        }
+
+        if ($this->isDebug() && $this->getRequest()?->query->has('fakeBot')) {
+            return true;
+        }
+
+        $user_agent = (string)$this->getRequest()?->server->get('HTTP_USER_AGENT', '');
+        if ($user_agent === '') {
+            return false;
+        }
+
+        foreach (array_keys(Bots::getAgents() ?? []) as $agent) {
+            if (stripos($user_agent, (string)$agent) !== false) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
